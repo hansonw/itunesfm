@@ -1,0 +1,26 @@
+{
+  "name": "itunesfm",
+  "version": "1.0.0",
+  "description": "Sync last.fm play counts with your iTunes library.",
+  "main": "bin/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "babel-node bin/main.js"
+  },
+  "author": "Hanson Wang",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.0.0",
+    "babel-plugin-syntax-flow": "^6.3.13",
+    "babel-plugin-transform-flow-strip-types": "^6.4.0",
+    "babel-preset-es2015": "^6.0.0",
+    "babel-preset-stage-0": "^6.0.0"
+  },
+  "dependencies": {
+    "lastfmapi": "0.0.6",
+    "q": "^1.4.1",
+    "xml2js": "^0.4.15",
+    "xml2json": "^0.9.0",
+    "xmldoc": "^0.4.0"
+  }
+}

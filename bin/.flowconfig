@@ -1,0 +1,11 @@
+[ignore]
+
+[include]
+../node_modules/q
+../node_modules/lastfmapi
+../node_modules/xmldoc
+
+[libs]
+
+[options]
+suppress_comment=.*\\$FlowIssue.*
