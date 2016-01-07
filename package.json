@@ -7,6 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "babel-node bin/main.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hansonw/itunesfm.git"
+  },
   "author": "Hanson Wang",
   "license": "ISC",
   "devDependencies": {
@@ -17,10 +21,10 @@
     "babel-preset-stage-0": "^6.0.0"
   },
   "dependencies": {
+    "bplist-parser": "^0.1.1",
     "lastfmapi": "0.0.6",
+    "prompt": "^0.2.14",
     "q": "^1.4.1",
-    "xml2js": "^0.4.15",
-    "xml2json": "^0.9.0",
     "xmldoc": "^0.4.0"
   }
 }

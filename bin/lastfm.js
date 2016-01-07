@@ -57,6 +57,7 @@ export async function getTopTracks(user: string): Promise<Array<TrackInfo>> {
     }
     console.log('Fetching play counts.. (%d/%d)', tracks.length, total)
   }
-  fs.writeFileSync(CACHE_FILE, JSON.stringify(tracks));
+  // cache results for development purposes
+  // fs.writeFileSync(CACHE_FILE, JSON.stringify(tracks));
   return tracks;
 }
