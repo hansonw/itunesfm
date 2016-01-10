@@ -5,7 +5,7 @@ import type {ITunesTrackInfo, Provider} from './Provider';
 import child_process from 'child_process';
 import path from 'path';
 
-const SCRIPTS_DIR = path.resolve(path.join(__dirname, '../../scripts'));
+const SCRIPTS_DIR = path.resolve(__dirname, '../../scripts');
 
 const WindowsProvider: Provider = {
   async getTracks() {

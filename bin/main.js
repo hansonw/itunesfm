@@ -35,6 +35,10 @@ var _os = require('os');
 
 var _os2 = _interopRequireDefault(_os);
 
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
 var _prompt = require('prompt');
 
 var _prompt2 = _interopRequireDefault(_prompt);
@@ -48,7 +52,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 _prompt2.default.colors = false;
 
 // Store ambiguous songs in this DB.
-var MATCHING_FILE = 'matching.json';
+var MATCHING_FILE = _path2.default.resolve(__dirname, '../matching.json');
 
 var quickPrompt = function () {
   var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(message) {

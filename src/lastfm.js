@@ -4,6 +4,7 @@ import LastfmAPI from 'lastfmapi';
 import promisify from './promisify';
 import levenshtein from 'levenshtein-edit-distance';
 import fs from 'fs';
+import path from 'path';
 
 const lfm = new LastfmAPI({
   'api_key' : 'f21088bf9097b49ad4e7f487abab981e',
@@ -42,7 +43,7 @@ export async function getTopTracks(
   user: string,
   useCached: boolean,
 ): Promise<Array<TrackInfo>> {
-  const CACHE_FILE = 'cache.json';
+  const CACHE_FILE = path.resolve(__dirname, '../cache.json');
   if (useCached) {
     try {
       return JSON.parse(fs.readFileSync(CACHE_FILE).toString());

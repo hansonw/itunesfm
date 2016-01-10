@@ -1,6 +1,6 @@
 {
   "name": "itunesfm",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Sync last.fm play counts with your iTunes library.",
   "main": "bin/main.js",
   "bin": {

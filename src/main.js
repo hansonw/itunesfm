@@ -6,6 +6,7 @@ import type {TrackInfo} from './lastfm';
 import invariant from 'assert';
 import fs from 'fs';
 import os from 'os';
+import path from 'path';
 import prompt from 'prompt';
 import promisify from './promisify';
 import {getTopTracks, matchTrack} from './lastfm';
@@ -13,7 +14,7 @@ import {getTopTracks, matchTrack} from './lastfm';
 prompt.colors = false;
 
 // Store ambiguous songs in this DB.
-const MATCHING_FILE = 'matching.json';
+const MATCHING_FILE = path.resolve(__dirname, '../matching.json');
 
 async function quickPrompt(message: string): Promise<string> {
   while (true) {

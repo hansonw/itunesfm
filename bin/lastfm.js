@@ -37,6 +37,10 @@ var _fs = require('fs');
 
 var _fs2 = _interopRequireDefault(_fs);
 
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var lfm = new _lastfmapi2.default({
@@ -56,7 +60,7 @@ var getTopTracks = exports.getTopTracks = function () {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            CACHE_FILE = 'cache.json';
+            CACHE_FILE = _path2.default.resolve(__dirname, '../cache.json');
 
             if (!useCached) {
               _context.next = 8;

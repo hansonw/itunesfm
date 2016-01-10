@@ -28,7 +28,7 @@ var _path2 = _interopRequireDefault(_path);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var SCRIPTS_DIR = _path2.default.resolve(_path2.default.join(__dirname, '../../scripts'));
+var SCRIPTS_DIR = _path2.default.resolve(__dirname, '../../scripts');
 
 var WindowsProvider = {
   getTracks: function getTracks() {
