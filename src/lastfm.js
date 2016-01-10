@@ -88,15 +88,17 @@ export function findMatchingTracks(
   tracks: Array<TrackInfo>,
   name: string,
   artist: ?string,
-  url: ?string,
+  urls: ?Array<string>,
 ): {matches: Array<TrackInfo>, nameMatches: Array<TrackInfo>} {
   const matches = [];
   let nameMatches = [];
   for (const track of tracks) {
-    if (url != null) {
-      if (track.url === url || tryDecode(track.url) === url) {
-        matches.push(track);
-        break;
+    if (urls != null) {
+      for (const url of urls) {
+        if (track.url === url || tryDecode(track.url) === url) {
+          matches.push(track);
+          break;
+        }
       }
       continue;
     }
@@ -109,7 +111,7 @@ export function findMatchingTracks(
     }
   }
 
-  if (url == null && matches.length + nameMatches.length === 0) {
+  if (urls == null && matches.length + nameMatches.length === 0) {
     // Try Levenshtein distance; return anything > 80%.
     const close = [];
     for (const track of tracks) {

@@ -137,7 +137,7 @@ function tryDecode(url) {
   return url;
 }
 
-function findMatchingTracks(tracks, name, artist, url) {
+function findMatchingTracks(tracks, name, artist, urls) {
   var matches = [];
   var nameMatches = [];
   var _iteratorNormalCompletion = true;
@@ -148,11 +148,35 @@ function findMatchingTracks(tracks, name, artist, url) {
     for (var _iterator = (0, _getIterator3.default)(tracks), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
       var _track2 = _step.value;
 
-      if (url != null) {
-        if (_track2.url === url || tryDecode(_track2.url) === url) {
-          matches.push(_track2);
-          break;
+      if (urls != null) {
+        var _iteratorNormalCompletion3 = true;
+        var _didIteratorError3 = false;
+        var _iteratorError3 = undefined;
+
+        try {
+          for (var _iterator3 = (0, _getIterator3.default)(urls), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+            var _url = _step3.value;
+
+            if (_track2.url === _url || tryDecode(_track2.url) === _url) {
+              matches.push(_track2);
+              break;
+            }
+          }
+        } catch (err) {
+          _didIteratorError3 = true;
+          _iteratorError3 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion3 && _iterator3.return) {
+              _iterator3.return();
+            }
+          } finally {
+            if (_didIteratorError3) {
+              throw _iteratorError3;
+            }
+          }
         }
+
         continue;
       }
 
@@ -178,7 +202,7 @@ function findMatchingTracks(tracks, name, artist, url) {
     }
   }
 
-  if (url == null && matches.length + nameMatches.length === 0) {
+  if (urls == null && matches.length + nameMatches.length === 0) {
     // Try Levenshtein distance; return anything > 80%.
     var close = [];
     var _iteratorNormalCompletion2 = true;

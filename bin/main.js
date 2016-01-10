@@ -8,6 +8,10 @@ var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
 
+var _getIterator2 = require('babel-runtime/core-js/get-iterator');
+
+var _getIterator3 = _interopRequireDefault(_getIterator2);
+
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -53,15 +57,33 @@ var quickPrompt = function () {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            _context.next = 2;
+            if (!true) {
+              _context.next = 9;
+              break;
+            }
+
+            _context.next = 3;
             return (0, _promisify2.default)(_prompt2.default, 'get', { properties: { result: { message: message } } });
 
-          case 2:
+          case 3:
             _ref = _context.sent;
             result = _ref.result;
+
+            if (!result) {
+              _context.next = 7;
+              break;
+            }
+
             return _context.abrupt('return', result);
 
-          case 5:
+          case 7:
+            _context.next = 0;
+            break;
+
+          case 9:
+            return _context.abrupt('return', '');
+
+          case 10:
           case 'end':
             return _context.stop();
         }
@@ -73,52 +95,90 @@ var quickPrompt = function () {
   };
 }();
 
+// for Flow
+
 var promptForMatch = function () {
   var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(name, artist, matches) {
-    var i, num;
+    var i, reply, result, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, num, match;
+
     return _regenerator2.default.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            console.log('Multiple matches for %s by %s. Please pick one:', name || '??', artist || '??');
+            console.log('Multiple matches for %s by %s. Enter valid numbers (comma separated):', name || '??', artist || '??');
             for (i = 0; i < matches.length; i++) {
               console.log('%d: %s by %s (%d plays)', i + 1, matches[i].name, matches[i].artist.name, matches[i].playcount);
             }
-            num = undefined;
+            _context2.next = 4;
+            return quickPrompt('Enter some numbers (0 for none, a for all)');
 
-          case 3:
-            _context2.next = 5;
-            return quickPrompt('Enter a number (0 for none)');
+          case 4:
+            reply = _context2.sent;
 
-          case 5:
-            _context2.t0 = _context2.sent;
-            num = parseInt(_context2.t0, 10);
+            if (!(reply === 'a' || reply === 'A')) {
+              _context2.next = 7;
+              break;
+            }
+
+            return _context2.abrupt('return', matches);
 
           case 7:
-            if (
-            // repeat until num is valid (not NaN)
-            num != num) {
-              _context2.next = 3;
+            result = [];
+            _iteratorNormalCompletion = true;
+            _didIteratorError = false;
+            _iteratorError = undefined;
+            _context2.prev = 11;
+
+            for (_iterator = (0, _getIterator3.default)(reply.split(',')); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              num = _step.value;
+              match = matches[parseInt(num, 10) - 1];
+
+              if (match != null) {
+                result.push(match);
+              }
+            }
+            _context2.next = 19;
+            break;
+
+          case 15:
+            _context2.prev = 15;
+            _context2.t0 = _context2['catch'](11);
+            _didIteratorError = true;
+            _iteratorError = _context2.t0;
+
+          case 19:
+            _context2.prev = 19;
+            _context2.prev = 20;
+
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+
+          case 22:
+            _context2.prev = 22;
+
+            if (!_didIteratorError) {
+              _context2.next = 25;
               break;
             }
 
-          case 8:
-            if (!(num <= 0 || num >= matches.length)) {
-              _context2.next = 10;
-              break;
-            }
+            throw _iteratorError;
 
-            return _context2.abrupt('return', null);
+          case 25:
+            return _context2.finish(22);
 
-          case 10:
-            return _context2.abrupt('return', matches[num - 1]);
+          case 26:
+            return _context2.finish(19);
 
-          case 11:
+          case 27:
+            return _context2.abrupt('return', result);
+
+          case 28:
           case 'end':
             return _context2.stop();
         }
       }
-    }, _callee2, this);
+    }, _callee2, this, [[11, 15, 19, 27], [20,, 22, 26]]);
   }));
   return function promptForMatch(_x2, _x3, _x4) {
     return ref.apply(this, arguments);
@@ -130,59 +190,74 @@ function normalizeURL(url) {
   var match = URL_REGEX.exec(url);
   if (match == null) {
     console.warn('warning: invalid URL ' + url + ' in matching.json');
-    return null;
+    return url;
   }
   // The album is never provided by last.fm's API.
   return 'http://www.last.fm/music/' + match[1] + '/_/' + match[2];
 }
 
 var matchTrack = function () {
-  var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(tracks, name, artist, key, matching) {
-    var _findMatchingTracks, matches, nameMatches, match;
+  var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(tracks, name, artist, id, matching) {
+    var urls, _findMatchingTracks, matches, nameMatches, result;
 
     return _regenerator2.default.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
-            _findMatchingTracks = (0, _lastfm.findMatchingTracks)(tracks, name, artist, matching[key] && normalizeURL(matching[key]));
+            urls = matching[id] && matching[id].map(normalizeURL);
+            _findMatchingTracks = (0, _lastfm.findMatchingTracks)(tracks, name, artist, urls);
             matches = _findMatchingTracks.matches;
             nameMatches = _findMatchingTracks.nameMatches;
-            match = undefined;
 
-            if (!(matches.length + nameMatches.length === 0)) {
-              _context3.next = 8;
+            if (!(urls != null)) {
+              _context3.next = 7;
               break;
             }
 
-            console.log('warning: could not match ' + name + ' by ' + artist + ' (id = ' + key + ')');
-            // TODO: use heuristics to determine possible matches
-            _context3.next = 16;
-            break;
+            if (matches.length === 0) {
+              console.warn('warning: you specified urls for ' + id + ' but no matches were found');
+            }
+            return _context3.abrupt('return', matches);
 
-          case 8:
-            if (!(matches.length === 1 || nameMatches.length === 1)) {
+          case 7:
+            result = [];
+
+            if (!(matches.length + nameMatches.length === 0)) {
               _context3.next = 12;
               break;
             }
 
-            match = matches[0] || nameMatches[0];
-            _context3.next = 16;
+            console.warn('warning: could not match ' + name + ' by ' + artist + ' (id = ' + id + ')');
+            // TODO: use heuristics to determine possible matches
+            _context3.next = 20;
             break;
 
           case 12:
-            _context3.next = 14;
-            return promptForMatch(name, artist, matches.length ? matches : nameMatches);
+            if (!(matches.length === 1 || nameMatches.length === 1)) {
+              _context3.next = 16;
+              break;
+            }
 
-          case 14:
-            match = _context3.sent;
-
-            // Record the absence of a match as well.
-            matching[key] = match == null ? '' : match.url;
+            result = [matches[0] || nameMatches[0]];
+            _context3.next = 20;
+            break;
 
           case 16:
-            return _context3.abrupt('return', match);
+            _context3.next = 18;
+            return promptForMatch(name, artist, matches.length ? matches : nameMatches);
 
-          case 17:
+          case 18:
+            result = _context3.sent;
+
+            // Record the absence of a match as well.
+            matching[id] = result.map(function (x) {
+              return x.url;
+            });
+
+          case 20:
+            return _context3.abrupt('return', result);
+
+          case 21:
           case 'end':
             return _context3.stop();
         }
@@ -196,7 +271,7 @@ var matchTrack = function () {
 
 var main = function () {
   var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
-    var provider, tracksPromise, username, useCached, topTracks, myTracks, matching, updates, id, _myTracks$id, name, artist, playedCount, match, matchPlayCount, ok;
+    var provider, tracksPromise, username, useCached, topTracks, myTracks, matching, updates, id, _myTracks$id, name, artist, playedCount, matches, matchPlayCount, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _match, ok;
 
     return _regenerator2.default.wrap(function _callee4$(_context4) {
       while (1) {
@@ -269,7 +344,7 @@ var main = function () {
 
           case 29:
             if ((_context4.t1 = _context4.t0()).done) {
-              _context4.next = 41;
+              _context4.next = 61;
               break;
             }
 
@@ -282,63 +357,103 @@ var main = function () {
             return matchTrack(topTracks, name, artist, id, matching);
 
           case 37:
-            match = _context4.sent;
+            matches = _context4.sent;
+            matchPlayCount = 0;
+            _iteratorNormalCompletion2 = true;
+            _didIteratorError2 = false;
+            _iteratorError2 = undefined;
+            _context4.prev = 42;
 
-            if (match != null) {
-              matchPlayCount = parseInt(match.playcount, 10);
+            for (_iterator2 = (0, _getIterator3.default)(matches); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+              _match = _step2.value;
 
-              if (playedCount < matchPlayCount) {
-                console.log('will update ' + name + ': ' + artist + ' to ' + match.playcount);
-                updates[id] = matchPlayCount;
-              }
+              matchPlayCount += parseInt(_match.playcount, 10);
+            }
+            _context4.next = 50;
+            break;
+
+          case 46:
+            _context4.prev = 46;
+            _context4.t2 = _context4['catch'](42);
+            _didIteratorError2 = true;
+            _iteratorError2 = _context4.t2;
+
+          case 50:
+            _context4.prev = 50;
+            _context4.prev = 51;
+
+            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+              _iterator2.return();
+            }
+
+          case 53:
+            _context4.prev = 53;
+
+            if (!_didIteratorError2) {
+              _context4.next = 56;
+              break;
+            }
+
+            throw _iteratorError2;
+
+          case 56:
+            return _context4.finish(53);
+
+          case 57:
+            return _context4.finish(50);
+
+          case 58:
+            if (playedCount < matchPlayCount) {
+              console.log('will update ' + name + ': ' + artist + ' to ' + matchPlayCount);
+              updates[id] = matchPlayCount;
             }
             _context4.next = 29;
             break;
 
-          case 41:
+          case 61:
             if (!((0, _keys2.default)(updates).length === 0)) {
-              _context4.next = 45;
+              _context4.next = 65;
               break;
             }
 
             console.log('No play counts were changed.');
-            _context4.next = 52;
+            _context4.next = 72;
             break;
 
-          case 45:
-            _context4.next = 47;
+          case 65:
+            _context4.next = 67;
             return quickPrompt('Save changes? y/n');
 
-          case 47:
+          case 67:
             ok = _context4.sent;
 
             if (!(ok === 'y')) {
-              _context4.next = 52;
+              _context4.next = 72;
               break;
             }
 
             console.log('Saving changes..');
-            _context4.next = 52;
+            _context4.next = 72;
             return provider.updateTracks(updates);
 
-          case 52:
+          case 72:
 
             _fs2.default.writeFileSync(MATCHING_FILE, (0, _stringify2.default)(matching));
-            _context4.next = 58;
+            _context4.next = 78;
             break;
 
-          case 55:
-            _context4.prev = 55;
-            _context4.t2 = _context4['catch'](0);
+          case 75:
+            _context4.prev = 75;
+            _context4.t3 = _context4['catch'](0);
 
-            console.error(_context4.t2);
+            console.error(_context4.t3);
 
-          case 58:
+          case 78:
           case 'end':
             return _context4.stop();
         }
       }
-    }, _callee4, this, [[0, 55]]);
+    }, _callee4, this, [[0, 75], [42, 46, 50, 58], [51,, 53, 57]]);
   }));
   return function main() {
     return ref.apply(this, arguments);

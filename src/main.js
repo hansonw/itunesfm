@@ -15,13 +15,22 @@ prompt.colors = false;
 const MATCHING_FILE = 'matching.json';
 
 async function quickPrompt(message: string): Promise<string> {
-  const {result} = await promisify(prompt, 'get', {properties: {result: {message}}});
-  return result;
+  while (true) {
+    const {result} = await promisify(prompt, 'get', {properties: {result: {message}}});
+    if (result) {
+      return result;
+    }
+  }
+  return ''; // for Flow
 }
 
-async function promptForMatch(name: ?string, artist: ?string, matches: Array<TrackInfo>) {
+async function promptForMatch(
+  name: ?string,
+  artist: ?string,
+  matches: Array<TrackInfo>,
+): Promise<Array<TrackInfo>> {
   console.log(
-    'Multiple matches for %s by %s. Please pick one:',
+    'Multiple matches for %s by %s. Enter valid numbers (comma separated):',
     name || '??',
     artist || '??',
   );
@@ -34,15 +43,18 @@ async function promptForMatch(name: ?string, artist: ?string, matches: Array<Tra
       matches[i].playcount,
     );
   }
-  let num;
-  do {
-    num = parseInt(await quickPrompt('Enter a number (0 for none)'), 10);
-    // repeat until num is valid (not NaN)
-  } while (num != num);
-  if (num <= 0 || num >= matches.length) {
-    return null;
+  const reply = await quickPrompt('Enter some numbers (0 for none, a for all)');
+  if (reply === 'a' || reply === 'A') {
+    return matches;
   }
-  return matches[num - 1];
+  let result = [];
+  for (const num of reply.split(',')) {
+    const match = matches[parseInt(num, 10) - 1];
+    if (match != null) {
+      result.push(match);
+    }
+  }
+  return result;
 }
 
 const URL_REGEX = /^.+last.fm\/music\/([^/]+)\/[^/]+\/([^/]+)$/;
@@ -50,7 +62,7 @@ function normalizeURL(url: string) {
   const match = URL_REGEX.exec(url);
   if (match == null) {
     console.warn(`warning: invalid URL ${url} in matching.json`);
-    return null;
+    return url;
   }
   // The album is never provided by last.fm's API.
   return `http://www.last.fm/music/${match[1]}/_/${match[2]}`;
@@ -60,27 +72,34 @@ async function matchTrack(
   tracks: Array<TrackInfo>,
   name: string,
   artist: ?string,
-  key: string,
-  matching: Object,
-) {
+  id: string,
+  matching: {[id: string]: Array<string>},
+): Promise<Array<TrackInfo>> {
+  const urls = matching[id] && matching[id].map(normalizeURL);
   const {matches, nameMatches} = findMatchingTracks(
     tracks,
     name,
     artist,
-    matching[key] && normalizeURL(matching[key]),
+    urls,
   );
-  let match;
+  if (urls != null) {
+    if (matches.length === 0) {
+      console.warn(`warning: you specified urls for ${id} but no matches were found`);
+    }
+    return matches;
+  }
+  let result = [];
   if (matches.length + nameMatches.length === 0) {
-    console.log(`warning: could not match ${name} by ${artist} (id = ${key})`);
+    console.warn(`warning: could not match ${name} by ${artist} (id = ${id})`);
     // TODO: use heuristics to determine possible matches
   } else if (matches.length === 1 || nameMatches.length === 1) {
-    match = matches[0] || nameMatches[0];
+    result = [matches[0] || nameMatches[0]];
   } else {
-    match = await promptForMatch(name, artist, matches.length ? matches : nameMatches);
+    result = await promptForMatch(name, artist, matches.length ? matches : nameMatches);
     // Record the absence of a match as well.
-    matching[key] = match == null ? '' : match.url;
+    matching[id] = result.map(x => x.url);
   }
-  return match;
+  return result;
 }
 
 async function main() {
@@ -119,13 +138,14 @@ async function main() {
     const updates = {};
     for (const id in myTracks) {
       const {name, artist, playedCount} = myTracks[id];
-      const match = await matchTrack(topTracks, name, artist, id, matching);
-      if (match != null) {
-        const matchPlayCount = parseInt(match.playcount, 10);
-        if (playedCount < matchPlayCount) {
-          console.log(`will update ${name}: ${artist} to ${match.playcount}`);
-          updates[id] = matchPlayCount;
-        }
+      const matches = await matchTrack(topTracks, name, artist, id, matching);
+      let matchPlayCount = 0;
+      for (const match of matches) {
+        matchPlayCount += parseInt(match.playcount, 10);
+      }
+      if (playedCount < matchPlayCount) {
+        console.log(`will update ${name}: ${artist} to ${matchPlayCount}`);
+        updates[id] = matchPlayCount;
       }
     }
 

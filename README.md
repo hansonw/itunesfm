@@ -24,7 +24,7 @@ Songs are matched using a fairly naive method:
 
 It should be pretty easy to improve :)
 
-In the case of ambiguities, you will be prompted to select a match: this is then recorded in a `matching.json` file for future script runs.
+In the case of ambiguities, you will be prompted for verification: this is then recorded in a `matching.json` file for future script runs.
 
 In the case where songs cannot be matched, you can try modifying `matching.json` manually. You'll notice that the script prints the following:
 
@@ -36,8 +36,8 @@ warning: could not match (..song..) (id = <identifier string>)
 
 ```
 {
-  "211801203:-536327029":"http://www.last.fm/music/Aimer/_/Last+Stardust",
-  "-1005162388:-866900706":"http://www.last.fm/music/%E3%82%84%E3%81%AA%E3%81%8E%E3%81%AA%E3%81%8E/_/%E6%98%A5%E6%93%AC%E3%81%8D",
+  "211801203:-536327029":["http://www.last.fm/music/Aimer/_/Last+Stardust"],
+  "-1005162388:-866900706":["http://www.last.fm/music/%E3%82%84%E3%81%AA%E3%81%8E%E3%81%AA%E3%81%8E/_/%E6%98%A5%E6%93%AC%E3%81%8D"],
 }
 ```
 
