@@ -10,6 +10,7 @@ const lfm = new LastfmAPI({
   'secret' : '7ccaec2093e33cded282ec7bc81c6fca'
 });
 
+const URL_REGEX = /^.+last.fm\/music\/([^/]+)\/[^/]+\/([^/]+)$/;
 const LEVENSHTEIN_THRESHOLD = 0.8;
 
 export type TrackInfo = {
@@ -84,7 +85,7 @@ function tryDecode(url: string): string {
   return url;
 }
 
-export function findMatchingTracks(
+function findMatchingTracks(
   tracks: Array<TrackInfo>,
   name: string,
   artist: ?string,
@@ -125,4 +126,37 @@ export function findMatchingTracks(
   }
 
   return {matches, nameMatches};
+}
+
+function normalizeURL(url: string) {
+  const match = URL_REGEX.exec(url);
+  if (match == null) {
+    console.warn(`warning: invalid URL ${url} in matching.json`);
+    return url;
+  }
+  // The album is never provided by last.fm's API.
+  return `http://www.last.fm/music/${match[1]}/_/${match[2]}`;
+}
+
+export async function matchTrack(
+  tracks: Array<TrackInfo>,
+  name: string,
+  artist: ?string,
+  urls: ?Array<string>,
+): Promise<Array<TrackInfo>> {
+  const {matches, nameMatches} = findMatchingTracks(
+    tracks,
+    name,
+    artist,
+    urls,
+  );
+  let result = [];
+  if (matches.length + nameMatches.length === 0) {
+    // TODO: use heuristics to determine possible matches
+  } else if (matches.length === 1 || nameMatches.length === 1) {
+    result = [matches[0] || nameMatches[0]];
+  } else {
+    result = matches.length ? matches : nameMatches;
+  }
+  return result;
 }

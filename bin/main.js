@@ -185,118 +185,34 @@ var promptForMatch = function () {
   };
 }();
 
-var URL_REGEX = /^.+last.fm\/music\/([^/]+)\/[^/]+\/([^/]+)$/;
-function normalizeURL(url) {
-  var match = URL_REGEX.exec(url);
-  if (match == null) {
-    console.warn('warning: invalid URL ' + url + ' in matching.json');
-    return url;
-  }
-  // The album is never provided by last.fm's API.
-  return 'http://www.last.fm/music/' + match[1] + '/_/' + match[2];
-}
-
-var matchTrack = function () {
-  var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(tracks, name, artist, id, matching) {
-    var urls, _findMatchingTracks, matches, nameMatches, result;
+var main = function () {
+  var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
+    var provider, tracksPromise, username, useCached, topTracks, myTracks, matching, updates, id, _myTracks$id, name, artist, playedCount, urls, matches, matchPlayCount, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _match, ok;
 
     return _regenerator2.default.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
-            urls = matching[id] && matching[id].map(normalizeURL);
-            _findMatchingTracks = (0, _lastfm.findMatchingTracks)(tracks, name, artist, urls);
-            matches = _findMatchingTracks.matches;
-            nameMatches = _findMatchingTracks.nameMatches;
-
-            if (!(urls != null)) {
-              _context3.next = 7;
-              break;
-            }
-
-            if (matches.length === 0) {
-              console.warn('warning: you specified urls for ' + id + ' but no matches were found');
-            }
-            return _context3.abrupt('return', matches);
-
-          case 7:
-            result = [];
-
-            if (!(matches.length + nameMatches.length === 0)) {
-              _context3.next = 12;
-              break;
-            }
-
-            console.warn('warning: could not match ' + name + ' by ' + artist + ' (id = ' + id + ')');
-            // TODO: use heuristics to determine possible matches
-            _context3.next = 20;
-            break;
-
-          case 12:
-            if (!(matches.length === 1 || nameMatches.length === 1)) {
-              _context3.next = 16;
-              break;
-            }
-
-            result = [matches[0] || nameMatches[0]];
-            _context3.next = 20;
-            break;
-
-          case 16:
-            _context3.next = 18;
-            return promptForMatch(name, artist, matches.length ? matches : nameMatches);
-
-          case 18:
-            result = _context3.sent;
-
-            // Record the absence of a match as well.
-            matching[id] = result.map(function (x) {
-              return x.url;
-            });
-
-          case 20:
-            return _context3.abrupt('return', result);
-
-          case 21:
-          case 'end':
-            return _context3.stop();
-        }
-      }
-    }, _callee3, this);
-  }));
-  return function matchTrack(_x5, _x6, _x7, _x8, _x9) {
-    return ref.apply(this, arguments);
-  };
-}();
-
-var main = function () {
-  var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
-    var provider, tracksPromise, username, useCached, topTracks, myTracks, matching, updates, id, _myTracks$id, name, artist, playedCount, matches, matchPlayCount, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _match, ok;
-
-    return _regenerator2.default.wrap(function _callee4$(_context4) {
-      while (1) {
-        switch (_context4.prev = _context4.next) {
-          case 0:
-            _context4.prev = 0;
+            _context3.prev = 0;
             provider = undefined;
 
             if (!(_os2.default.platform() === 'win32')) {
-              _context4.next = 6;
+              _context3.next = 6;
               break;
             }
 
             provider = require('./providers/WindowsProvider.js');
-            _context4.next = 11;
+            _context3.next = 11;
             break;
 
           case 6:
             if (!(_os2.default.platform() === 'darwin')) {
-              _context4.next = 10;
+              _context3.next = 10;
               break;
             }
 
             provider = require('./providers/OSXProvider');
-            _context4.next = 11;
+            _context3.next = 11;
             break;
 
           case 10:
@@ -308,28 +224,28 @@ var main = function () {
             username = process.argv[2];
 
             if (!(username == null)) {
-              _context4.next = 17;
+              _context3.next = 17;
               break;
             }
 
-            _context4.next = 16;
+            _context3.next = 16;
             return quickPrompt('Enter your last.fm username');
 
           case 16:
-            username = _context4.sent;
+            username = _context3.sent;
 
           case 17:
             useCached = process.argv.indexOf('cache') !== -1;
-            _context4.next = 20;
+            _context3.next = 20;
             return (0, _lastfm.getTopTracks)(username, useCached);
 
           case 20:
-            topTracks = _context4.sent;
-            _context4.next = 23;
+            topTracks = _context3.sent;
+            _context3.next = 23;
             return tracksPromise;
 
           case 23:
-            myTracks = _context4.sent;
+            myTracks = _context3.sent;
 
             console.log('Found %d tracks locally, %d on last.fm.', (0, _keys2.default)(myTracks).length, topTracks.length);
 
@@ -340,120 +256,150 @@ var main = function () {
             } catch (e) {}
 
             updates = {};
-            _context4.t0 = _regenerator2.default.keys(myTracks);
+            _context3.t0 = _regenerator2.default.keys(myTracks);
 
           case 29:
-            if ((_context4.t1 = _context4.t0()).done) {
-              _context4.next = 61;
+            if ((_context3.t1 = _context3.t0()).done) {
+              _context3.next = 71;
               break;
             }
 
-            id = _context4.t1.value;
+            id = _context3.t1.value;
             _myTracks$id = myTracks[id];
             name = _myTracks$id.name;
             artist = _myTracks$id.artist;
             playedCount = _myTracks$id.playedCount;
-            _context4.next = 37;
-            return matchTrack(topTracks, name, artist, id, matching);
+            urls = matching[id];
+            _context3.next = 38;
+            return (0, _lastfm.matchTrack)(topTracks, name, artist, urls);
 
-          case 37:
-            matches = _context4.sent;
+          case 38:
+            matches = _context3.sent;
+
+            if (!(matches.length === 0)) {
+              _context3.next = 43;
+              break;
+            }
+
+            console.warn('warning: could not match ' + name + ' by ' + artist + ' (id = ' + id + ')');
+            if (urls != null) {
+              console.warn('additionally, you provided urls but none matched');
+            }
+            return _context3.abrupt('continue', 29);
+
+          case 43:
+            if (!(urls == null && matches.length > 1)) {
+              _context3.next = 48;
+              break;
+            }
+
+            _context3.next = 46;
+            return promptForMatch(name, artist, matches);
+
+          case 46:
+            matches = _context3.sent;
+
+            matching[id] = matches.map(function (x) {
+              return x.url;
+            });
+
+          case 48:
             matchPlayCount = 0;
             _iteratorNormalCompletion2 = true;
             _didIteratorError2 = false;
             _iteratorError2 = undefined;
-            _context4.prev = 42;
+            _context3.prev = 52;
 
             for (_iterator2 = (0, _getIterator3.default)(matches); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
               _match = _step2.value;
 
               matchPlayCount += parseInt(_match.playcount, 10);
             }
-            _context4.next = 50;
+            _context3.next = 60;
             break;
 
-          case 46:
-            _context4.prev = 46;
-            _context4.t2 = _context4['catch'](42);
+          case 56:
+            _context3.prev = 56;
+            _context3.t2 = _context3['catch'](52);
             _didIteratorError2 = true;
-            _iteratorError2 = _context4.t2;
+            _iteratorError2 = _context3.t2;
 
-          case 50:
-            _context4.prev = 50;
-            _context4.prev = 51;
+          case 60:
+            _context3.prev = 60;
+            _context3.prev = 61;
 
             if (!_iteratorNormalCompletion2 && _iterator2.return) {
               _iterator2.return();
             }
 
-          case 53:
-            _context4.prev = 53;
+          case 63:
+            _context3.prev = 63;
 
             if (!_didIteratorError2) {
-              _context4.next = 56;
+              _context3.next = 66;
               break;
             }
 
             throw _iteratorError2;
 
-          case 56:
-            return _context4.finish(53);
+          case 66:
+            return _context3.finish(63);
 
-          case 57:
-            return _context4.finish(50);
+          case 67:
+            return _context3.finish(60);
 
-          case 58:
+          case 68:
             if (playedCount < matchPlayCount) {
               console.log('will update ' + name + ': ' + artist + ' to ' + matchPlayCount);
               updates[id] = matchPlayCount;
             }
-            _context4.next = 29;
+            _context3.next = 29;
             break;
 
-          case 61:
+          case 71:
             if (!((0, _keys2.default)(updates).length === 0)) {
-              _context4.next = 65;
+              _context3.next = 75;
               break;
             }
 
             console.log('No play counts were changed.');
-            _context4.next = 72;
+            _context3.next = 82;
             break;
 
-          case 65:
-            _context4.next = 67;
+          case 75:
+            _context3.next = 77;
             return quickPrompt('Save changes? y/n');
 
-          case 67:
-            ok = _context4.sent;
+          case 77:
+            ok = _context3.sent;
 
             if (!(ok === 'y')) {
-              _context4.next = 72;
+              _context3.next = 82;
               break;
             }
 
             console.log('Saving changes..');
-            _context4.next = 72;
+            _context3.next = 82;
             return provider.updateTracks(updates);
 
-          case 72:
+          case 82:
 
             _fs2.default.writeFileSync(MATCHING_FILE, (0, _stringify2.default)(matching));
-            _context4.next = 78;
+            _context3.next = 88;
             break;
 
-          case 75:
-            _context4.prev = 75;
-            _context4.t3 = _context4['catch'](0);
+          case 85:
+            _context3.prev = 85;
+            _context3.t3 = _context3['catch'](0);
 
-            console.error(_context4.t3);
+            console.error(_context3.t3);
 
-          case 78:
+          case 88:
           case 'end':
-            return _context4.stop();
+            return _context3.stop();
         }
       }
-    }, _callee4, this, [[0, 75], [42, 46, 50, 58], [51,, 53, 57]]);
+    }, _callee3, this, [[0, 85], [52, 56, 60, 68], [61,, 63, 67]]);
   }));
   return function main() {
     return ref.apply(this, arguments);

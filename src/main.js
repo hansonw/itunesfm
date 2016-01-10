@@ -7,7 +7,7 @@ import fs from 'fs';
 import os from 'os';
 import prompt from 'prompt';
 import promisify from './promisify';
-import {getTopTracks, findMatchingTracks} from './lastfm';
+import {getTopTracks, matchTrack} from './lastfm';
 
 prompt.colors = false;
 
@@ -57,51 +57,6 @@ async function promptForMatch(
   return result;
 }
 
-const URL_REGEX = /^.+last.fm\/music\/([^/]+)\/[^/]+\/([^/]+)$/;
-function normalizeURL(url: string) {
-  const match = URL_REGEX.exec(url);
-  if (match == null) {
-    console.warn(`warning: invalid URL ${url} in matching.json`);
-    return url;
-  }
-  // The album is never provided by last.fm's API.
-  return `http://www.last.fm/music/${match[1]}/_/${match[2]}`;
-}
-
-async function matchTrack(
-  tracks: Array<TrackInfo>,
-  name: string,
-  artist: ?string,
-  id: string,
-  matching: {[id: string]: Array<string>},
-): Promise<Array<TrackInfo>> {
-  const urls = matching[id] && matching[id].map(normalizeURL);
-  const {matches, nameMatches} = findMatchingTracks(
-    tracks,
-    name,
-    artist,
-    urls,
-  );
-  if (urls != null) {
-    if (matches.length === 0) {
-      console.warn(`warning: you specified urls for ${id} but no matches were found`);
-    }
-    return matches;
-  }
-  let result = [];
-  if (matches.length + nameMatches.length === 0) {
-    console.warn(`warning: could not match ${name} by ${artist} (id = ${id})`);
-    // TODO: use heuristics to determine possible matches
-  } else if (matches.length === 1 || nameMatches.length === 1) {
-    result = [matches[0] || nameMatches[0]];
-  } else {
-    result = await promptForMatch(name, artist, matches.length ? matches : nameMatches);
-    // Record the absence of a match as well.
-    matching[id] = result.map(x => x.url);
-  }
-  return result;
-}
-
 async function main() {
   try {
     let provider;
@@ -138,7 +93,19 @@ async function main() {
     const updates = {};
     for (const id in myTracks) {
       const {name, artist, playedCount} = myTracks[id];
-      const matches = await matchTrack(topTracks, name, artist, id, matching);
+      const urls = matching[id];
+      let matches = await matchTrack(topTracks, name, artist, urls);
+      if (matches.length === 0) {
+        console.warn(`warning: could not match ${name} by ${artist} (id = ${id})`);
+        if (urls != null) {
+          console.warn('additionally, you provided urls but none matched');
+        }
+        continue;
+      }
+      if (urls == null && matches.length > 1) {
+        matches = await promptForMatch(name, artist, matches);
+        matching[id] = matches.map(x => x.url);
+      }
       let matchPlayCount = 0;
       for (const match of matches) {
         matchPlayCount += parseInt(match.playcount, 10);

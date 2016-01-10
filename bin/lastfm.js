@@ -3,8 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getTopTracks = undefined;
-exports.findMatchingTracks = findMatchingTracks;
+exports.matchTrack = exports.getTopTracks = undefined;
 
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
@@ -45,6 +44,7 @@ var lfm = new _lastfmapi2.default({
   'secret': '7ccaec2093e33cded282ec7bc81c6fca'
 });
 
+var URL_REGEX = /^.+last.fm\/music\/([^/]+)\/[^/]+\/([^/]+)$/;
 var LEVENSHTEIN_THRESHOLD = 0.8;
 // streamable, image, @attr are omitted
 
@@ -240,3 +240,47 @@ function findMatchingTracks(tracks, name, artist, urls) {
 
   return { matches: matches, nameMatches: nameMatches };
 }
+
+function normalizeURL(url) {
+  var match = URL_REGEX.exec(url);
+  if (match == null) {
+    console.warn('warning: invalid URL ' + url + ' in matching.json');
+    return url;
+  }
+  // The album is never provided by last.fm's API.
+  return 'http://www.last.fm/music/' + match[1] + '/_/' + match[2];
+}
+
+var matchTrack = exports.matchTrack = function () {
+  var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(tracks, name, artist, urls) {
+    var _findMatchingTracks, matches, nameMatches, result;
+
+    return _regenerator2.default.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _findMatchingTracks = findMatchingTracks(tracks, name, artist, urls);
+            matches = _findMatchingTracks.matches;
+            nameMatches = _findMatchingTracks.nameMatches;
+            result = [];
+
+            if (matches.length + nameMatches.length === 0) {
+              // TODO: use heuristics to determine possible matches
+            } else if (matches.length === 1 || nameMatches.length === 1) {
+                result = [matches[0] || nameMatches[0]];
+              } else {
+                result = matches.length ? matches : nameMatches;
+              }
+            return _context2.abrupt('return', result);
+
+          case 6:
+          case 'end':
+            return _context2.stop();
+        }
+      }
+    }, _callee2, this);
+  }));
+  return function matchTrack(_x3, _x4, _x5, _x6) {
+    return ref.apply(this, arguments);
+  };
+}();
