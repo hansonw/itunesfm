@@ -125,6 +125,17 @@ var promptForMatch = function () {
   };
 }();
 
+var URL_REGEX = /^.+last.fm\/music\/([^/]+)\/[^/]+\/([^/]+)$/;
+function normalizeURL(url) {
+  var match = URL_REGEX.exec(url);
+  if (match == null) {
+    console.warn('warning: invalid URL ' + url + ' in matching.json');
+    return null;
+  }
+  // The album is never provided by last.fm's API.
+  return 'http://www.last.fm/music/' + match[1] + '/_/' + match[2];
+}
+
 var matchTrack = function () {
   var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(tracks, name, artist, key, matching) {
     var _findMatchingTracks, matches, nameMatches, match;
@@ -133,7 +144,7 @@ var matchTrack = function () {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
-            _findMatchingTracks = (0, _lastfm.findMatchingTracks)(tracks, name, artist, key && matching[key]);
+            _findMatchingTracks = (0, _lastfm.findMatchingTracks)(tracks, name, artist, matching[key] && normalizeURL(matching[key]));
             matches = _findMatchingTracks.matches;
             nameMatches = _findMatchingTracks.nameMatches;
             match = undefined;

@@ -130,6 +130,13 @@ function match(a, b) {
   return a.trim().toLocaleLowerCase() === b.trim().toLocaleLowerCase();
 }
 
+function tryDecode(url) {
+  try {
+    return decodeURIComponent(url);
+  } catch (e) {}
+  return url;
+}
+
 function findMatchingTracks(tracks, name, artist, url) {
   var matches = [];
   var nameMatches = [];
@@ -142,7 +149,7 @@ function findMatchingTracks(tracks, name, artist, url) {
       var _track2 = _step.value;
 
       if (url != null) {
-        if (_track2.url === url) {
+        if (_track2.url === url || tryDecode(_track2.url) === url) {
           matches.push(_track2);
           break;
         }

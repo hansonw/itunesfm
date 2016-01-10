@@ -45,6 +45,17 @@ async function promptForMatch(name: ?string, artist: ?string, matches: Array<Tra
   return matches[num - 1];
 }
 
+const URL_REGEX = /^.+last.fm\/music\/([^/]+)\/[^/]+\/([^/]+)$/;
+function normalizeURL(url: string) {
+  const match = URL_REGEX.exec(url);
+  if (match == null) {
+    console.warn(`warning: invalid URL ${url} in matching.json`);
+    return null;
+  }
+  // The album is never provided by last.fm's API.
+  return `http://www.last.fm/music/${match[1]}/_/${match[2]}`;
+}
+
 async function matchTrack(
   tracks: Array<TrackInfo>,
   name: string,
@@ -56,7 +67,7 @@ async function matchTrack(
     tracks,
     name,
     artist,
-    key && matching[key],
+    matching[key] && normalizeURL(matching[key]),
   );
   let match;
   if (matches.length + nameMatches.length === 0) {

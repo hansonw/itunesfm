@@ -77,6 +77,13 @@ function match(a: ?string, b: ?string): boolean {
   return a.trim().toLocaleLowerCase() === b.trim().toLocaleLowerCase();
 }
 
+function tryDecode(url: string): string {
+  try {
+    return decodeURIComponent(url);
+  } catch (e) {}
+  return url;
+}
+
 export function findMatchingTracks(
   tracks: Array<TrackInfo>,
   name: string,
@@ -87,7 +94,7 @@ export function findMatchingTracks(
   let nameMatches = [];
   for (const track of tracks) {
     if (url != null) {
-      if (track.url === url) {
+      if (track.url === url || tryDecode(track.url) === url) {
         matches.push(track);
         break;
       }

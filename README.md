@@ -41,11 +41,7 @@ warning: could not match (..song..) (id = <identifier string>)
 }
 ```
 
-You can find the URL for a song on last.fm by checking your scrobble history and going to the track page. Please ensure that:
-
-- the URL is properly encoded (via `encodeURIComponent`), especially for non-English songs
-  - Chrome should automatically do this if you copy from the address bar
-- the album name is replaced with `_`, as in the example
+You can find the URL for a song on last.fm by checking your scrobble history and going to the track page. The format should match the example exactly (`http://www.last.fm/music/<ARTIST>/_/<SONG_NAME>`).
 
 ## Making changes
 
