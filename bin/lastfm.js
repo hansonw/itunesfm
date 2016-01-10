@@ -26,9 +26,9 @@ var _lastfmapi = require('lastfmapi');
 
 var _lastfmapi2 = _interopRequireDefault(_lastfmapi);
 
-var _q = require('q');
+var _promisify = require('./promisify');
 
-var _q2 = _interopRequireDefault(_q);
+var _promisify2 = _interopRequireDefault(_promisify);
 
 var _fs = require('fs');
 
@@ -73,7 +73,7 @@ var getTopTracks = exports.getTopTracks = function () {
 
           case 11:
             _context.next = 13;
-            return _q2.default.ninvoke(lfm.user, 'getTopTracks', {
+            return (0, _promisify2.default)(lfm.user, 'getTopTracks', {
               user: user,
               limit: 5000, // API per-page limit
               page: _page

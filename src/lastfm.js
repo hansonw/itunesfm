@@ -1,7 +1,7 @@
 /* @flow */
 
 import LastfmAPI from 'lastfmapi';
-import q from 'q';
+import promisify from './promisify';
 import fs from 'fs';
 
 const lfm = new LastfmAPI({
@@ -50,7 +50,7 @@ export async function getTopTracks(
   console.log('Fetching play counts from last.fm..')
   let tracks = [];
   for (let page = 1; ; page++) {
-    const result: TopTracksResult = await q.ninvoke(lfm.user, 'getTopTracks', {
+    const result: TopTracksResult = await promisify(lfm.user, 'getTopTracks', {
       user,
       limit: 5000, // API per-page limit
       page: page,
