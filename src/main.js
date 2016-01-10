@@ -70,14 +70,6 @@ async function matchTrack(
 
 async function main() {
   try {
-    let username = process.argv[2];
-    if (username == null) {
-      username = await quickPrompt('Enter your last.fm username');
-    }
-    const useCached = process.argv.indexOf('cache') !== -1;
-    const topTracks = await getTopTracks(username, useCached);
-    console.log('Finished fetching %d play counts.', topTracks.length);
-
     let provider;
     if (os.platform() === 'win32') {
       provider = require('./providers/WindowsProvider.js');
@@ -86,13 +78,31 @@ async function main() {
     } else {
       throw new Error(`platform ${os.platform()} not supported`);
     }
+    // Start fetching from iTunes immediately.
+    const tracksPromise = provider.getTracks();
+
+    let username = process.argv[2];
+    if (username == null) {
+      username = await quickPrompt('Enter your last.fm username');
+    }
+    const useCached = process.argv.indexOf('cache') !== -1;
+
+    const [myTracks, topTracks] = await Promise.all([
+      tracksPromise,
+      getTopTracks(username, useCached),
+    ]);
+
+    console.log(
+      'Found %d tracks locally, %d on last.fm.',
+      Object.keys(myTracks).length,
+      topTracks.length,
+    );
 
     let matching = {};
     try {
       matching = JSON.parse(fs.readFileSync(MATCHING_FILE).toString());
     } catch (e) {}
 
-    const myTracks = await provider.getTracks();
     const updates = {};
     for (const id in myTracks) {
       const {name, artist, playedCount} = myTracks[id];

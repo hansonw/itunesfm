@@ -1,5 +1,9 @@
 'use strict';
 
+var _promise = require('babel-runtime/core-js/promise');
+
+var _promise2 = _interopRequireDefault(_promise);
+
 var _stringify = require('babel-runtime/core-js/json/stringify');
 
 var _stringify2 = _interopRequireDefault(_stringify);
@@ -7,6 +11,10 @@ var _stringify2 = _interopRequireDefault(_stringify);
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
+
+var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
+
+var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 
 var _regenerator = require('babel-runtime/regenerator');
 
@@ -173,78 +181,78 @@ var matchTrack = function () {
 
 var main = function () {
   var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
-    var username, useCached, topTracks, provider, matching, myTracks, updates, id, _myTracks$id, name, artist, playedCount, match, matchPlayCount, ok;
+    var provider, tracksPromise, username, useCached, _ref2, _ref3, myTracks, topTracks, matching, updates, id, _myTracks$id, name, artist, playedCount, match, matchPlayCount, ok;
 
     return _regenerator2.default.wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
           case 0:
             _context4.prev = 0;
-            username = process.argv[2];
+            provider = undefined;
 
-            if (!(username == null)) {
+            if (!(_os2.default.platform() === 'win32')) {
               _context4.next = 6;
               break;
             }
 
-            _context4.next = 5;
-            return quickPrompt('Enter your last.fm username');
-
-          case 5:
-            username = _context4.sent;
-
-          case 6:
-            useCached = process.argv.indexOf('cache') !== -1;
-            _context4.next = 9;
-            return (0, _lastfm.getTopTracks)(username, useCached);
-
-          case 9:
-            topTracks = _context4.sent;
-
-            console.log('Finished fetching %d play counts.', topTracks.length);
-
-            provider = undefined;
-
-            if (!(_os2.default.platform() === 'win32')) {
-              _context4.next = 16;
-              break;
-            }
-
             provider = require('./providers/WindowsProvider.js');
-            _context4.next = 21;
+            _context4.next = 11;
             break;
 
-          case 16:
+          case 6:
             if (!(_os2.default.platform() === 'darwin')) {
-              _context4.next = 20;
+              _context4.next = 10;
               break;
             }
 
             provider = require('./providers/OSXProvider');
-            _context4.next = 21;
+            _context4.next = 11;
             break;
 
-          case 20:
+          case 10:
             throw new Error('platform ' + _os2.default.platform() + ' not supported');
 
-          case 21:
+          case 11:
+            // Start fetching from iTunes immediately.
+            tracksPromise = provider.getTracks();
+            username = process.argv[2];
+
+            if (!(username == null)) {
+              _context4.next = 17;
+              break;
+            }
+
+            _context4.next = 16;
+            return quickPrompt('Enter your last.fm username');
+
+          case 16:
+            username = _context4.sent;
+
+          case 17:
+            useCached = process.argv.indexOf('cache') !== -1;
+            _context4.next = 20;
+            return _promise2.default.all([tracksPromise, (0, _lastfm.getTopTracks)(username, useCached)]);
+
+          case 20:
+            _ref2 = _context4.sent;
+            _ref3 = (0, _slicedToArray3.default)(_ref2, 2);
+            myTracks = _ref3[0];
+            topTracks = _ref3[1];
+
+            console.log('Found %d tracks locally, %d on last.fm.', (0, _keys2.default)(myTracks).length, topTracks.length);
+
             matching = {};
 
             try {
               matching = JSON.parse(_fs2.default.readFileSync(MATCHING_FILE).toString());
             } catch (e) {}
 
-            _context4.next = 25;
-            return provider.getTracks();
-
-          case 25:
-            myTracks = _context4.sent;
             updates = {};
             _context4.t0 = _regenerator2.default.keys(myTracks);
 
-          case 28:
+          case 29:
             if ((_context4.t1 = _context4.t0()).done) {
-              _context4.next = 40;
+              _context4.next = 41;
               break;
             }
 
@@ -253,10 +261,10 @@ var main = function () {
             name = _myTracks$id.name;
             artist = _myTracks$id.artist;
             playedCount = _myTracks$id.playedCount;
-            _context4.next = 36;
+            _context4.next = 37;
             return matchTrack(topTracks, name, artist, id, matching);
 
-          case 36:
+          case 37:
             match = _context4.sent;
 
             if (match != null) {
@@ -267,53 +275,53 @@ var main = function () {
                 updates[id] = matchPlayCount;
               }
             }
-            _context4.next = 28;
+            _context4.next = 29;
             break;
 
-          case 40:
+          case 41:
             if (!((0, _keys2.default)(updates).length === 0)) {
-              _context4.next = 44;
+              _context4.next = 45;
               break;
             }
 
             console.log('No play counts were changed.');
-            _context4.next = 51;
+            _context4.next = 52;
             break;
 
-          case 44:
-            _context4.next = 46;
+          case 45:
+            _context4.next = 47;
             return quickPrompt('Save changes? y/n');
 
-          case 46:
+          case 47:
             ok = _context4.sent;
 
             if (!(ok === 'y')) {
-              _context4.next = 51;
+              _context4.next = 52;
               break;
             }
 
             console.log('Saving changes..');
-            _context4.next = 51;
+            _context4.next = 52;
             return provider.updateTracks(updates);
 
-          case 51:
+          case 52:
 
             _fs2.default.writeFileSync(MATCHING_FILE, (0, _stringify2.default)(matching));
-            _context4.next = 57;
+            _context4.next = 58;
             break;
 
-          case 54:
-            _context4.prev = 54;
+          case 55:
+            _context4.prev = 55;
             _context4.t2 = _context4['catch'](0);
 
             console.error(_context4.t2);
 
-          case 57:
+          case 58:
           case 'end':
             return _context4.stop();
         }
       }
-    }, _callee4, this, [[0, 54]]);
+    }, _callee4, this, [[0, 55]]);
   }));
   return function main() {
     return ref.apply(this, arguments);
