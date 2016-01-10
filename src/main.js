@@ -1,3 +1,4 @@
+#!/usr/bin/env
 /* @flow */
 
 import type {TrackInfo} from './lastfm';

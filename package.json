@@ -1,8 +1,11 @@
 {
   "name": "itunesfm",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Sync last.fm play counts with your iTunes library.",
   "main": "bin/main.js",
+  "bin": {
+    "itunesfm": "./bin/main.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "gulp",

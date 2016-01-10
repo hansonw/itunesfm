@@ -22,7 +22,13 @@ var _child_process = require('child_process');
 
 var _child_process2 = _interopRequireDefault(_child_process);
 
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var SCRIPTS_DIR = _path2.default.resolve(_path2.default.join(__dirname, '../../scripts'));
 
 var WindowsProvider = {
   getTracks: function getTracks() {
@@ -34,7 +40,7 @@ var WindowsProvider = {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              proc = _child_process2.default.spawn('wscript.exe', ['scripts/win_getTracks.js']);
+              proc = _child_process2.default.spawn('wscript.exe', [_path2.default.join(SCRIPTS_DIR, 'win_getTracks.js')]);
               stdout = '';
 
               proc.stdout.on('data', function (data) {
@@ -66,7 +72,7 @@ var WindowsProvider = {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              proc = _child_process2.default.spawn('wscript.exe', ['scripts/win_updateTracks.js']);
+              proc = _child_process2.default.spawn('wscript.exe', [_path2.default.join(SCRIPTS_DIR, 'win_updateTracks.js')]);
 
               proc.stdin.write(encodeURIComponent((0, _stringify2.default)(counts)) + '\n');
               stdout = '';
