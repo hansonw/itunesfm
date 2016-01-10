@@ -121,7 +121,7 @@ function match(a, b) {
   if (a == null || b == null) {
     return true;
   }
-  return a.toLocaleLowerCase() === b.toLocaleLowerCase();
+  return a.trim().toLocaleLowerCase() === b.trim().toLocaleLowerCase();
 }
 
 function findMatchingTracks(tracks, name, artist, url) {

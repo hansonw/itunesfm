@@ -15,6 +15,11 @@ prompt.colors = false;
 // Store ambiguous songs in this DB.
 const MATCHING_FILE = 'matching.json';
 
+function optionalRequire(module: string): any {
+  // $FlowIssue: unsafe way to require an optional module.
+  return require(module);
+}
+
 function idx(x: ?Object, key: string): ?string {
   if (x == null) {
     return null;
@@ -93,7 +98,7 @@ async function main() {
 
     try {
       if (os.platform() === 'win32') {
-        const win32ole = require('win32ole');
+        const win32ole = optionalRequire('win32ole');
         const iTunesApp = win32ole.client.Dispatch('iTunes.Application');
         const tracks = iTunesApp.LibraryPlaylist().Tracks();
         for (let i = 1; i <= tracks.Count(); i++) {
@@ -111,11 +116,66 @@ async function main() {
             }
           }
         }
+      } else if (os.platform() === 'darwin') {
+        function Application(): any {} // stub for Flow
+        const osa = optionalRequire('osa');
+        const osaPromise = (fn, ...args) => {
+          return new Promise((resolve, reject) => {
+            osa(fn, ...args, (err, result) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(result);
+              }
+            });
+          });
+        };
+        const tracks = await osaPromise(() => {
+          var itunes = Application('iTunes');
+          var tracks = itunes.libraryPlaylists[0].tracks;
+          var result = [];
+          for (var i = 0; i < tracks.length; i++) {
+            var track = tracks[i];
+            if (track.videoKind() !== 'none') {
+              continue;
+            }
+            result.push({
+              id: track.persistentID(),
+              name: track.name(),
+              artist: track.artist(),
+              playedCount: track.playedCount(),
+            });
+          }
+          return result;
+        });
+        const updates = {};
+        for (const track of tracks) {
+          const {id, name, artist, playedCount} = track;
+          const match = await matchTrack(topTracks, name, artist, id, matching);
+          if (match != null) {
+            const matchPlayCount = parseInt(match.playcount, 10);
+            if (playedCount < matchPlayCount) {
+              console.log(`updating ${name}: ${artist} to ${match.playcount}`);
+              updates[id] = matchPlayCount;
+            }
+          }
+        }
+        await osaPromise((counts) => {
+          var itunes = Application('iTunes');
+          var tracks = itunes.libraryPlaylists[0].tracks;
+          for (var i = 0; i < tracks.length; i++) {
+            var track = tracks[i];
+            var id = track.persistentID();
+            if (counts[id]) {
+              track.playedCount = counts[id];
+            }
+          }
+        }, updates);
       } else {
         throw new Error('not implemented');
       }
     } catch (e) {
-      console.log('Native API failed. Falling back to loading XML files.');
+      console.log('Native API failed. Falling back to loading XML files.', e);
       // Try matching iTunes tracks to last.fm tracks.
       // getTopTracks doesn't give us album info :( but ambiguities are rare.
       // TODO: explicitly fetch album data when this happens.

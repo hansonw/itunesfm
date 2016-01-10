@@ -71,7 +71,7 @@ function match(a: ?string, b: ?string): boolean {
   if (a == null || b == null) {
     return true;
   }
-  return a.toLocaleLowerCase() === b.toLocaleLowerCase();
+  return a.trim().toLocaleLowerCase() === b.trim().toLocaleLowerCase();
 }
 
 export function findMatchingTracks(
