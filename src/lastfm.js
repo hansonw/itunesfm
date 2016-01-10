@@ -2,12 +2,15 @@
 
 import LastfmAPI from 'lastfmapi';
 import promisify from './promisify';
+import levenshtein from 'levenshtein-edit-distance';
 import fs from 'fs';
 
 const lfm = new LastfmAPI({
   'api_key' : 'f21088bf9097b49ad4e7f487abab981e',
   'secret' : '7ccaec2093e33cded282ec7bc81c6fca'
 });
+
+const LEVENSHTEIN_THRESHOLD = 0.8;
 
 export type TrackInfo = {
   name: string,
@@ -76,12 +79,12 @@ function match(a: ?string, b: ?string): boolean {
 
 export function findMatchingTracks(
   tracks: Array<TrackInfo>,
-  name: ?string,
+  name: string,
   artist: ?string,
   url: ?string,
 ): {matches: Array<TrackInfo>, nameMatches: Array<TrackInfo>} {
   const matches = [];
-  const nameMatches = [];
+  let nameMatches = [];
   for (const track of tracks) {
     if (url != null) {
       if (track.url === url) {
@@ -98,5 +101,19 @@ export function findMatchingTracks(
       }
     }
   }
+
+  if (url == null && matches.length + nameMatches.length === 0) {
+    // Try Levenshtein distance; return anything > 80%.
+    const close = [];
+    for (const track of tracks) {
+      const dist = levenshtein(name, track.name, true);
+      const ratio = (name.length - dist) / name.length;
+      if (ratio >= LEVENSHTEIN_THRESHOLD) {
+        close.push([-ratio, track]);
+      }
+      nameMatches = close.sort().map(x => x[1]);
+    }
+  }
+
   return {matches, nameMatches};
 }

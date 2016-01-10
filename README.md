@@ -17,7 +17,14 @@ Play counts will only be updated if the last.fm play count is **higher** than yo
 
 ## Notes
 
-Songs are naively matched based on their title and artist name. In the case of ambiguities, you will be prompted to select a match: this is then recorded in a `matching.json` file for future script runs.
+Songs are matched using a fairly naive method:
+- First, we look for exact name + artist matches.
+- If none exist, we consider exact name matches only.
+- If still none exist, consider names with >= 80% similarity (via Levenshtein distance)
+
+It should be pretty easy to improve :)
+
+In the case of ambiguities, you will be prompted to select a match: this is then recorded in a `matching.json` file for future script runs.
 
 In the case where songs cannot be matched, you can try modifying `matching.json` manually. You'll notice that the script prints the following:
 
@@ -36,11 +43,9 @@ warning: could not match (..song..) (id = <identifier string>)
 
 You can find the URL for a song on last.fm by checking your scrobble history and going to the track page. Please ensure that:
 
-- the URL is properly encoded, especially for non-English songs
+- the URL is properly encoded (via `encodeURIComponent`), especially for non-English songs
   - Chrome should automatically do this if you copy from the address bar
 - the album name is replaced with `_`, as in the example
-
-TODO: use edit distance to provide a list of likely matches.
 
 ## Making changes
 

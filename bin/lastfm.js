@@ -30,6 +30,10 @@ var _promisify = require('./promisify');
 
 var _promisify2 = _interopRequireDefault(_promisify);
 
+var _levenshteinEditDistance = require('levenshtein-edit-distance');
+
+var _levenshteinEditDistance2 = _interopRequireDefault(_levenshteinEditDistance);
+
 var _fs = require('fs');
 
 var _fs2 = _interopRequireDefault(_fs);
@@ -40,6 +44,8 @@ var lfm = new _lastfmapi2.default({
   'api_key': 'f21088bf9097b49ad4e7f487abab981e',
   'secret': '7ccaec2093e33cded282ec7bc81c6fca'
 });
+
+var LEVENSHTEIN_THRESHOLD = 0.8;
 // streamable, image, @attr are omitted
 
 var getTopTracks = exports.getTopTracks = function () {
@@ -133,20 +139,20 @@ function findMatchingTracks(tracks, name, artist, url) {
 
   try {
     for (var _iterator = (0, _getIterator3.default)(tracks), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var _track = _step.value;
+      var _track2 = _step.value;
 
       if (url != null) {
-        if (_track.url === url) {
-          matches.push(_track);
+        if (_track2.url === url) {
+          matches.push(_track2);
           break;
         }
         continue;
       }
 
-      if (match(_track.name, name)) {
-        nameMatches.push(_track);
-        if (match(_track.artist.name, artist)) {
-          matches.push(_track);
+      if (match(_track2.name, name)) {
+        nameMatches.push(_track2);
+        if (match(_track2.artist.name, artist)) {
+          matches.push(_track2);
         }
       }
     }
@@ -161,6 +167,42 @@ function findMatchingTracks(tracks, name, artist, url) {
     } finally {
       if (_didIteratorError) {
         throw _iteratorError;
+      }
+    }
+  }
+
+  if (url == null && matches.length + nameMatches.length === 0) {
+    // Try Levenshtein distance; return anything > 80%.
+    var close = [];
+    var _iteratorNormalCompletion2 = true;
+    var _didIteratorError2 = false;
+    var _iteratorError2 = undefined;
+
+    try {
+      for (var _iterator2 = (0, _getIterator3.default)(tracks), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+        var _track = _step2.value;
+
+        var dist = (0, _levenshteinEditDistance2.default)(name, _track.name, true);
+        var ratio = (name.length - dist) / name.length;
+        if (ratio >= LEVENSHTEIN_THRESHOLD) {
+          close.push([-ratio, _track]);
+        }
+        nameMatches = close.sort().map(function (x) {
+          return x[1];
+        });
+      }
+    } catch (err) {
+      _didIteratorError2 = true;
+      _iteratorError2 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion2 && _iterator2.return) {
+          _iterator2.return();
+        }
+      } finally {
+        if (_didIteratorError2) {
+          throw _iteratorError2;
+        }
       }
     }
   }

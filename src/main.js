@@ -34,7 +34,11 @@ async function promptForMatch(name: ?string, artist: ?string, matches: Array<Tra
       matches[i].playcount,
     );
   }
-  const num = parseInt(await quickPrompt('Enter a number (0 for none)'), 10);
+  let num;
+  do {
+    num = parseInt(await quickPrompt('Enter a number (0 for none)'), 10);
+    // repeat until num is valid (not NaN)
+  } while (num != num);
   if (num <= 0 || num >= matches.length) {
     return null;
   }
@@ -43,7 +47,7 @@ async function promptForMatch(name: ?string, artist: ?string, matches: Array<Tra
 
 async function matchTrack(
   tracks: Array<TrackInfo>,
-  name: ?string,
+  name: string,
   artist: ?string,
   key: string,
   matching: Object,
@@ -87,10 +91,8 @@ async function main() {
     }
     const useCached = process.argv.indexOf('cache') !== -1;
 
-    const [myTracks, topTracks] = await Promise.all([
-      tracksPromise,
-      getTopTracks(username, useCached),
-    ]);
+    const topTracks = await getTopTracks(username, useCached);
+    const myTracks = await tracksPromise;
 
     console.log(
       'Found %d tracks locally, %d on last.fm.',

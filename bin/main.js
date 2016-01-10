@@ -1,9 +1,5 @@
 'use strict';
 
-var _promise = require('babel-runtime/core-js/promise');
-
-var _promise2 = _interopRequireDefault(_promise);
-
 var _stringify = require('babel-runtime/core-js/json/stringify');
 
 var _stringify2 = _interopRequireDefault(_stringify);
@@ -11,10 +7,6 @@ var _stringify2 = _interopRequireDefault(_stringify);
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
-
-var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
-
-var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
 
 var _regenerator = require('babel-runtime/regenerator');
 
@@ -92,24 +84,36 @@ var promptForMatch = function () {
             for (i = 0; i < matches.length; i++) {
               console.log('%d: %s by %s (%d plays)', i + 1, matches[i].name, matches[i].artist.name, matches[i].playcount);
             }
-            _context2.next = 4;
+            num = undefined;
+
+          case 3:
+            _context2.next = 5;
             return quickPrompt('Enter a number (0 for none)');
 
-          case 4:
+          case 5:
             _context2.t0 = _context2.sent;
             num = parseInt(_context2.t0, 10);
 
+          case 7:
+            if (
+            // repeat until num is valid (not NaN)
+            num != num) {
+              _context2.next = 3;
+              break;
+            }
+
+          case 8:
             if (!(num <= 0 || num >= matches.length)) {
-              _context2.next = 8;
+              _context2.next = 10;
               break;
             }
 
             return _context2.abrupt('return', null);
 
-          case 8:
+          case 10:
             return _context2.abrupt('return', matches[num - 1]);
 
-          case 9:
+          case 11:
           case 'end':
             return _context2.stop();
         }
@@ -181,7 +185,7 @@ var matchTrack = function () {
 
 var main = function () {
   var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
-    var provider, tracksPromise, username, useCached, _ref2, _ref3, myTracks, topTracks, matching, updates, id, _myTracks$id, name, artist, playedCount, match, matchPlayCount, ok;
+    var provider, tracksPromise, username, useCached, topTracks, myTracks, matching, updates, id, _myTracks$id, name, artist, playedCount, match, matchPlayCount, ok;
 
     return _regenerator2.default.wrap(function _callee4$(_context4) {
       while (1) {
@@ -231,13 +235,15 @@ var main = function () {
           case 17:
             useCached = process.argv.indexOf('cache') !== -1;
             _context4.next = 20;
-            return _promise2.default.all([tracksPromise, (0, _lastfm.getTopTracks)(username, useCached)]);
+            return (0, _lastfm.getTopTracks)(username, useCached);
 
           case 20:
-            _ref2 = _context4.sent;
-            _ref3 = (0, _slicedToArray3.default)(_ref2, 2);
-            myTracks = _ref3[0];
-            topTracks = _ref3[1];
+            topTracks = _context4.sent;
+            _context4.next = 23;
+            return tracksPromise;
+
+          case 23:
+            myTracks = _context4.sent;
 
             console.log('Found %d tracks locally, %d on last.fm.', (0, _keys2.default)(myTracks).length, topTracks.length);
 
