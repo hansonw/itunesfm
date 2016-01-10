@@ -5,7 +5,8 @@
   "main": "bin/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "babel-node bin/main.js"
+    "build": "gulp",
+    "start": "node bin/main.js"
   },
   "repository": {
     "type": "git",
@@ -17,10 +18,14 @@
     "babel-cli": "^6.0.0",
     "babel-plugin-syntax-flow": "^6.3.13",
     "babel-plugin-transform-flow-strip-types": "^6.4.0",
+    "babel-plugin-transform-runtime": "^6.4.0",
     "babel-preset-es2015": "^6.0.0",
-    "babel-preset-stage-0": "^6.0.0"
+    "babel-preset-stage-0": "^6.0.0",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.1"
   },
   "dependencies": {
+    "babel-runtime": "^6.3.19",
     "bplist-parser": "^0.1.1",
     "lastfmapi": "0.0.6",
     "prompt": "^0.2.14",
