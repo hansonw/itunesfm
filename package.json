@@ -26,5 +26,9 @@
     "prompt": "^0.2.14",
     "q": "^1.4.1",
     "xmldoc": "^0.4.0"
+  },
+  "optionalDependencies": {
+    "node-win32ole": "hansonw/node-win32ole#dev0.1.3",
+    "osa": ""
   }
 }
