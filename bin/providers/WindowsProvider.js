@@ -61,7 +61,7 @@ var WindowsProvider = {
     var _this2 = this;
 
     return (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
-      var proc;
+      var proc, stdout;
       return _regenerator2.default.wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
@@ -69,6 +69,8 @@ var WindowsProvider = {
               proc = _child_process2.default.spawn('wscript.exe', ['scripts/win_updateTracks.js']);
 
               proc.stdin.write(encodeURIComponent((0, _stringify2.default)(counts)) + '\n');
+              stdout = '';
+
               proc.stdout.on('data', function (data) {
                 console.log(data.toString());
               });
@@ -81,7 +83,7 @@ var WindowsProvider = {
                 });
               }));
 
-            case 4:
+            case 5:
             case 'end':
               return _context2.stop();
           }

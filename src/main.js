@@ -45,7 +45,7 @@ async function matchTrack(
   tracks: Array<TrackInfo>,
   name: ?string,
   artist: ?string,
-  key: ?string,
+  key: string,
   matching: Object,
 ) {
   const {matches, nameMatches} = findMatchingTracks(
@@ -56,15 +56,14 @@ async function matchTrack(
   );
   let match;
   if (matches.length + nameMatches.length === 0) {
-    console.log(`warning: could not match ${name} by ${artist}`);
+    console.log(`warning: could not match ${name} by ${artist} (id = ${key})`);
     // TODO: use heuristics to determine possible matches
   } else if (matches.length === 1 || nameMatches.length === 1) {
     match = matches[0] || nameMatches[0];
   } else {
     match = await promptForMatch(name, artist, matches.length ? matches : nameMatches);
-    if (match != null && key) {
-      matching[key] = match.url;
-    }
+    // Record the absence of a match as well.
+    matching[key] = match == null ? '' : match.url;
   }
   return match;
 }
@@ -101,16 +100,20 @@ async function main() {
       if (match != null) {
         const matchPlayCount = parseInt(match.playcount, 10);
         if (playedCount < matchPlayCount) {
-          console.log(`updating ${name}: ${artist} to ${match.playcount}`);
+          console.log(`will update ${name}: ${artist} to ${match.playcount}`);
           updates[id] = matchPlayCount;
         }
       }
     }
 
-    const ok = await quickPrompt('Save changes? y/n');
-    if (ok === 'y') {
-      console.log('Saving changes..');
-      await provider.updateTracks(updates);
+    if (Object.keys(updates).length === 0) {
+      console.log('No play counts were changed.');
+    } else {
+      const ok = await quickPrompt('Save changes? y/n');
+      if (ok === 'y') {
+        console.log('Saving changes..');
+        await provider.updateTracks(updates);
+      }
     }
 
     fs.writeFileSync(MATCHING_FILE, JSON.stringify(matching));

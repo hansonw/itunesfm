@@ -4,6 +4,10 @@ var _stringify = require('babel-runtime/core-js/json/stringify');
 
 var _stringify2 = _interopRequireDefault(_stringify);
 
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -127,7 +131,7 @@ var matchTrack = function () {
               break;
             }
 
-            console.log('warning: could not match ' + name + ' by ' + artist);
+            console.log('warning: could not match ' + name + ' by ' + artist + ' (id = ' + key + ')');
             // TODO: use heuristics to determine possible matches
             _context3.next = 16;
             break;
@@ -149,9 +153,8 @@ var matchTrack = function () {
           case 14:
             match = _context3.sent;
 
-            if (match != null && key) {
-              matching[key] = match.url;
-            }
+            // Record the absence of a match as well.
+            matching[key] = match == null ? '' : match.url;
 
           case 16:
             return _context3.abrupt('return', match);
@@ -260,7 +263,7 @@ var main = function () {
               matchPlayCount = parseInt(match.playcount, 10);
 
               if (playedCount < matchPlayCount) {
-                console.log('updating ' + name + ': ' + artist + ' to ' + match.playcount);
+                console.log('will update ' + name + ': ' + artist + ' to ' + match.playcount);
                 updates[id] = matchPlayCount;
               }
             }
@@ -268,39 +271,49 @@ var main = function () {
             break;
 
           case 40:
-            _context4.next = 42;
+            if (!((0, _keys2.default)(updates).length === 0)) {
+              _context4.next = 44;
+              break;
+            }
+
+            console.log('No play counts were changed.');
+            _context4.next = 51;
+            break;
+
+          case 44:
+            _context4.next = 46;
             return quickPrompt('Save changes? y/n');
 
-          case 42:
+          case 46:
             ok = _context4.sent;
 
             if (!(ok === 'y')) {
-              _context4.next = 47;
+              _context4.next = 51;
               break;
             }
 
             console.log('Saving changes..');
-            _context4.next = 47;
+            _context4.next = 51;
             return provider.updateTracks(updates);
 
-          case 47:
+          case 51:
 
             _fs2.default.writeFileSync(MATCHING_FILE, (0, _stringify2.default)(matching));
-            _context4.next = 53;
+            _context4.next = 57;
             break;
 
-          case 50:
-            _context4.prev = 50;
+          case 54:
+            _context4.prev = 54;
             _context4.t2 = _context4['catch'](0);
 
             console.error(_context4.t2);
 
-          case 53:
+          case 57:
           case 'end':
             return _context4.stop();
         }
       }
-    }, _callee4, this, [[0, 50]]);
+    }, _callee4, this, [[0, 54]]);
   }));
   return function main() {
     return ref.apply(this, arguments);

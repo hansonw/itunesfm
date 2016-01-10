@@ -24,6 +24,7 @@ const WindowsProvider: Provider = {
   async updateTracks(counts) {
     const proc = child_process.spawn('wscript.exe', ['scripts/win_updateTracks.js']);
     proc.stdin.write(encodeURIComponent(JSON.stringify(counts)) + '\n');
+    let stdout = '';
     proc.stdout.on('data', (data) => {
       console.log(data.toString());
     });
