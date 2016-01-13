@@ -24,7 +24,7 @@ Songs are matched using a fairly naive method:
 
 It should be pretty easy to improve :)
 
-In the case of ambiguities, you will be prompted for verification: this is then recorded in a `matching.json` file (in `/usr/local/lib/node_modules/itunesfm`) for future script runs.
+In the case of ambiguities, you will be prompted for verification: this is then recorded in a `matching.json` file (in `/usr/local/lib/node_modules/itunesfm`, or `%APPDATA%\npm\node_modules\itunesfm` on Windows) for future script runs.
 
 In the case where songs cannot be matched, you can try modifying `matching.json` manually. You'll notice that the script prints the following:
 
