@@ -1,4 +1,4 @@
-#!/usr/bin/env
+#!/usr/bin/env node
 'use strict';
 
 var _stringify = require('babel-runtime/core-js/json/stringify');

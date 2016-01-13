@@ -7,8 +7,8 @@ Useful if you scrobble to last.fm from iTunes on multiple computers / devices an
 ## Usage
 
 ```
-npm install itunesfm
-node itunesfm <last.fm username>
+npm install -g itunesfm
+itunesfm <last.fm username>
 ```
 
 Potential changes will be displayed in the console, and you will be prompted before anything is actually saved.
@@ -24,7 +24,7 @@ Songs are matched using a fairly naive method:
 
 It should be pretty easy to improve :)
 
-In the case of ambiguities, you will be prompted for verification: this is then recorded in a `matching.json` file (in `node_modules/itunesfm`) for future script runs.
+In the case of ambiguities, you will be prompted for verification: this is then recorded in a `matching.json` file (in `/usr/local/lib/node_modules/itunesfm`) for future script runs.
 
 In the case where songs cannot be matched, you can try modifying `matching.json` manually. You'll notice that the script prints the following:
 
