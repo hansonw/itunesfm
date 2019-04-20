@@ -57,7 +57,7 @@ export async function getTopTracks(
   for (let page = 1; ; page++) {
     const result: TopTracksResult = await promisify(lfm.user, 'getTopTracks', {
       user,
-      limit: 5000, // API per-page limit
+      limit: 1000, // API per-page limit
       page: page,
     });
     tracks = tracks.concat(result.track);
