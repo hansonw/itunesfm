@@ -12,8 +12,6 @@ var _promise = require('babel-runtime/core-js/promise');
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var _Provider = require('./Provider');
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var osa = require('osa');
@@ -40,7 +38,7 @@ var OSXProvider = {
   getTracks: function getTracks() {
     var _this = this;
 
-    return (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
+    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
       return _regenerator2.default.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -78,7 +76,7 @@ var OSXProvider = {
   updateTracks: function updateTracks(counts) {
     var _this2 = this;
 
-    return (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
+    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
       return _regenerator2.default.wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {

@@ -21,42 +21,9 @@ var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
-var _lastfm = require('./lastfm');
-
-var _assert = require('assert');
-
-var _assert2 = _interopRequireDefault(_assert);
-
-var _fs = require('fs');
-
-var _fs2 = _interopRequireDefault(_fs);
-
-var _os = require('os');
-
-var _os2 = _interopRequireDefault(_os);
-
-var _path = require('path');
-
-var _path2 = _interopRequireDefault(_path);
-
-var _prompt = require('prompt');
-
-var _prompt2 = _interopRequireDefault(_prompt);
-
-var _promisify = require('./promisify');
-
-var _promisify2 = _interopRequireDefault(_promisify);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-_prompt2.default.colors = false;
-
-// Store ambiguous songs in this DB.
-var MATCHING_FILE = _path2.default.resolve(__dirname, '../matching.json');
-
 var quickPrompt = function () {
-  var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(message) {
-    var _ref, result;
+  var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(message) {
+    var _ref2, result;
 
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
@@ -71,8 +38,8 @@ var quickPrompt = function () {
             return (0, _promisify2.default)(_prompt2.default, 'get', { properties: { result: { message: message } } });
 
           case 3:
-            _ref = _context.sent;
-            result = _ref.result;
+            _ref2 = _context.sent;
+            result = _ref2.result;
 
             if (!result) {
               _context.next = 7;
@@ -95,15 +62,14 @@ var quickPrompt = function () {
       }
     }, _callee, this);
   }));
+
   return function quickPrompt(_x) {
-    return ref.apply(this, arguments);
+    return _ref.apply(this, arguments);
   };
 }();
 
-// for Flow
-
 var promptForMatch = function () {
-  var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(name, artist, matches) {
+  var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(name, artist, matches) {
     var i, reply, result, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, num, match;
 
     return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -185,21 +151,22 @@ var promptForMatch = function () {
       }
     }, _callee2, this, [[11, 15, 19, 27], [20,, 22, 26]]);
   }));
+
   return function promptForMatch(_x2, _x3, _x4) {
-    return ref.apply(this, arguments);
+    return _ref3.apply(this, arguments);
   };
 }();
 
 var main = function () {
-  var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
-    var provider, tracksPromise, username, useCached, topTracks, myTracks, matching, updates, id, _myTracks$id, name, artist, playedCount, urls, matches, matchPlayCount, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, _match, ok;
+  var _ref4 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
+    var provider, tracksPromise, username, useCached, topTracks, myTracks, matching, updates, id, _myTracks$id, name, artist, playedCount, urls, matches, matchPlayCount, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, match, ok;
 
     return _regenerator2.default.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
             _context3.prev = 0;
-            provider = undefined;
+            provider = void 0;
 
             if (!(_os2.default.platform() === 'win32')) {
               _context3.next = 6;
@@ -252,6 +219,7 @@ var main = function () {
           case 23:
             myTracks = _context3.sent;
 
+
             console.log('Found %d tracks locally, %d on last.fm.', (0, _keys2.default)(myTracks).length, topTracks.length);
 
             matching = {};
@@ -265,24 +233,21 @@ var main = function () {
 
           case 29:
             if ((_context3.t1 = _context3.t0()).done) {
-              _context3.next = 71;
+              _context3.next = 68;
               break;
             }
 
             id = _context3.t1.value;
-            _myTracks$id = myTracks[id];
-            name = _myTracks$id.name;
-            artist = _myTracks$id.artist;
-            playedCount = _myTracks$id.playedCount;
+            _myTracks$id = myTracks[id], name = _myTracks$id.name, artist = _myTracks$id.artist, playedCount = _myTracks$id.playedCount;
             urls = matching[id];
-            _context3.next = 38;
+            _context3.next = 35;
             return (0, _lastfm.matchTrack)(topTracks, name, artist, urls);
 
-          case 38:
+          case 35:
             matches = _context3.sent;
 
             if (!(matches.length === 0)) {
-              _context3.next = 43;
+              _context3.next = 40;
               break;
             }
 
@@ -292,68 +257,68 @@ var main = function () {
             }
             return _context3.abrupt('continue', 29);
 
-          case 43:
+          case 40:
             if (!(urls == null && matches.length > 1)) {
-              _context3.next = 48;
+              _context3.next = 45;
               break;
             }
 
-            _context3.next = 46;
+            _context3.next = 43;
             return promptForMatch(name, artist, matches);
 
-          case 46:
+          case 43:
             matches = _context3.sent;
 
             matching[id] = matches.map(function (x) {
               return x.url;
             });
 
-          case 48:
+          case 45:
             matchPlayCount = 0;
             _iteratorNormalCompletion2 = true;
             _didIteratorError2 = false;
             _iteratorError2 = undefined;
-            _context3.prev = 52;
+            _context3.prev = 49;
 
             for (_iterator2 = (0, _getIterator3.default)(matches); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-              _match = _step2.value;
+              match = _step2.value;
 
-              matchPlayCount += parseInt(_match.playcount, 10);
+              matchPlayCount += parseInt(match.playcount, 10);
             }
-            _context3.next = 60;
+            _context3.next = 57;
             break;
 
-          case 56:
-            _context3.prev = 56;
-            _context3.t2 = _context3['catch'](52);
+          case 53:
+            _context3.prev = 53;
+            _context3.t2 = _context3['catch'](49);
             _didIteratorError2 = true;
             _iteratorError2 = _context3.t2;
 
-          case 60:
-            _context3.prev = 60;
-            _context3.prev = 61;
+          case 57:
+            _context3.prev = 57;
+            _context3.prev = 58;
 
             if (!_iteratorNormalCompletion2 && _iterator2.return) {
               _iterator2.return();
             }
 
-          case 63:
-            _context3.prev = 63;
+          case 60:
+            _context3.prev = 60;
 
             if (!_didIteratorError2) {
-              _context3.next = 66;
+              _context3.next = 63;
               break;
             }
 
             throw _iteratorError2;
 
-          case 66:
-            return _context3.finish(63);
-
-          case 67:
+          case 63:
             return _context3.finish(60);
 
-          case 68:
+          case 64:
+            return _context3.finish(57);
+
+          case 65:
             if (playedCount < matchPlayCount) {
               console.log('will update ' + name + ': ' + artist + ' to ' + matchPlayCount);
               updates[id] = matchPlayCount;
@@ -361,54 +326,88 @@ var main = function () {
             _context3.next = 29;
             break;
 
-          case 71:
+          case 68:
             if (!((0, _keys2.default)(updates).length === 0)) {
-              _context3.next = 75;
+              _context3.next = 72;
               break;
             }
 
             console.log('No play counts were changed.');
-            _context3.next = 82;
+            _context3.next = 79;
             break;
 
-          case 75:
-            _context3.next = 77;
+          case 72:
+            _context3.next = 74;
             return quickPrompt('Save changes? y/n');
 
-          case 77:
+          case 74:
             ok = _context3.sent;
 
             if (!(ok === 'y')) {
-              _context3.next = 82;
+              _context3.next = 79;
               break;
             }
 
             console.log('Saving changes..');
-            _context3.next = 82;
+            _context3.next = 79;
             return provider.updateTracks(updates);
 
-          case 82:
+          case 79:
 
             _fs2.default.writeFileSync(MATCHING_FILE, (0, _stringify2.default)(matching));
-            _context3.next = 88;
+            _context3.next = 85;
             break;
 
-          case 85:
-            _context3.prev = 85;
+          case 82:
+            _context3.prev = 82;
             _context3.t3 = _context3['catch'](0);
 
             console.error(_context3.t3);
 
-          case 88:
+          case 85:
           case 'end':
             return _context3.stop();
         }
       }
-    }, _callee3, this, [[0, 85], [52, 56, 60, 68], [61,, 63, 67]]);
+    }, _callee3, this, [[0, 82], [49, 53, 57, 65], [58,, 60, 64]]);
   }));
+
   return function main() {
-    return ref.apply(this, arguments);
+    return _ref4.apply(this, arguments);
   };
 }();
+
+var _assert = require('assert');
+
+var _assert2 = _interopRequireDefault(_assert);
+
+var _fs = require('fs');
+
+var _fs2 = _interopRequireDefault(_fs);
+
+var _os = require('os');
+
+var _os2 = _interopRequireDefault(_os);
+
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
+var _prompt = require('prompt');
+
+var _prompt2 = _interopRequireDefault(_prompt);
+
+var _promisify = require('./promisify');
+
+var _promisify2 = _interopRequireDefault(_promisify);
+
+var _lastfm = require('./lastfm');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_prompt2.default.colors = false;
+
+// Store ambiguous songs in this DB.
+var MATCHING_FILE = _path2.default.resolve(__dirname, '../matching.json');
 
 main();

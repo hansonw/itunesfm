@@ -21,39 +21,8 @@ var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
-var _lastfmapi = require('lastfmapi');
-
-var _lastfmapi2 = _interopRequireDefault(_lastfmapi);
-
-var _promisify = require('./promisify');
-
-var _promisify2 = _interopRequireDefault(_promisify);
-
-var _levenshteinEditDistance = require('levenshtein-edit-distance');
-
-var _levenshteinEditDistance2 = _interopRequireDefault(_levenshteinEditDistance);
-
-var _fs = require('fs');
-
-var _fs2 = _interopRequireDefault(_fs);
-
-var _path = require('path');
-
-var _path2 = _interopRequireDefault(_path);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var lfm = new _lastfmapi2.default({
-  'api_key': 'f21088bf9097b49ad4e7f487abab981e',
-  'secret': '7ccaec2093e33cded282ec7bc81c6fca'
-});
-
-var URL_REGEX = /^.+last.fm\/music\/([^/]+)\/[^/]+\/([^/]+)$/;
-var LEVENSHTEIN_THRESHOLD = 0.8;
-// streamable, image, @attr are omitted
-
 var getTopTracks = exports.getTopTracks = function () {
-  var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(user, useCached) {
+  var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(user, useCached) {
     var CACHE_FILE, tracks, _page, result, _total;
 
     return _regenerator2.default.wrap(function _callee$(_context) {
@@ -75,7 +44,6 @@ var getTopTracks = exports.getTopTracks = function () {
             _context.t0 = _context['catch'](2);
 
           case 8:
-            // cache doesn't exist; this is normal
 
             console.log('Fetching play counts from last.fm..');
             tracks = [];
@@ -85,7 +53,7 @@ var getTopTracks = exports.getTopTracks = function () {
             _context.next = 13;
             return (0, _promisify2.default)(lfm.user, 'getTopTracks', {
               user: user,
-              limit: 5000, // API per-page limit
+              limit: 1000, // API per-page limit
               page: _page
             });
 
@@ -122,10 +90,74 @@ var getTopTracks = exports.getTopTracks = function () {
       }
     }, _callee, this, [[2, 6]]);
   }));
+
   return function getTopTracks(_x, _x2) {
-    return ref.apply(this, arguments);
+    return _ref.apply(this, arguments);
   };
 }();
+
+var matchTrack = exports.matchTrack = function () {
+  var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(tracks, name, artist, urls) {
+    var _findMatchingTracks, matches, nameMatches, result;
+
+    return _regenerator2.default.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _findMatchingTracks = findMatchingTracks(tracks, name, artist, urls), matches = _findMatchingTracks.matches, nameMatches = _findMatchingTracks.nameMatches;
+            result = [];
+
+            if (matches.length + nameMatches.length === 0) {
+              // TODO: use heuristics to determine possible matches
+            } else if (matches.length === 1 || nameMatches.length === 1) {
+              result = [matches[0] || nameMatches[0]];
+            } else {
+              result = matches.length ? matches : nameMatches;
+            }
+            return _context2.abrupt('return', result);
+
+          case 4:
+          case 'end':
+            return _context2.stop();
+        }
+      }
+    }, _callee2, this);
+  }));
+
+  return function matchTrack(_x3, _x4, _x5, _x6) {
+    return _ref2.apply(this, arguments);
+  };
+}();
+
+var _lastfmapi = require('lastfmapi');
+
+var _lastfmapi2 = _interopRequireDefault(_lastfmapi);
+
+var _promisify = require('./promisify');
+
+var _promisify2 = _interopRequireDefault(_promisify);
+
+var _levenshteinEditDistance = require('levenshtein-edit-distance');
+
+var _levenshteinEditDistance2 = _interopRequireDefault(_levenshteinEditDistance);
+
+var _fs = require('fs');
+
+var _fs2 = _interopRequireDefault(_fs);
+
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var lfm = new _lastfmapi2.default({
+  'api_key': 'f21088bf9097b49ad4e7f487abab981e',
+  'secret': '7ccaec2093e33cded282ec7bc81c6fca'
+});
+
+var URL_REGEX = /^.+last.fm\/music\/([^/]+)\/[^/]+\/([^/]+)$/;
+var LEVENSHTEIN_THRESHOLD = 0.8;
 
 function match(a, b) {
   if (a == null || b == null) {
@@ -254,37 +286,3 @@ function normalizeURL(url) {
   // The album is never provided by last.fm's API.
   return 'http://www.last.fm/music/' + match[1] + '/_/' + match[2];
 }
-
-var matchTrack = exports.matchTrack = function () {
-  var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(tracks, name, artist, urls) {
-    var _findMatchingTracks, matches, nameMatches, result;
-
-    return _regenerator2.default.wrap(function _callee2$(_context2) {
-      while (1) {
-        switch (_context2.prev = _context2.next) {
-          case 0:
-            _findMatchingTracks = findMatchingTracks(tracks, name, artist, urls);
-            matches = _findMatchingTracks.matches;
-            nameMatches = _findMatchingTracks.nameMatches;
-            result = [];
-
-            if (matches.length + nameMatches.length === 0) {
-              // TODO: use heuristics to determine possible matches
-            } else if (matches.length === 1 || nameMatches.length === 1) {
-                result = [matches[0] || nameMatches[0]];
-              } else {
-                result = matches.length ? matches : nameMatches;
-              }
-            return _context2.abrupt('return', result);
-
-          case 6:
-          case 'end':
-            return _context2.stop();
-        }
-      }
-    }, _callee2, this);
-  }));
-  return function matchTrack(_x3, _x4, _x5, _x6) {
-    return ref.apply(this, arguments);
-  };
-}();

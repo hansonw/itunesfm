@@ -16,8 +16,6 @@ var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
-var _Provider = require('./Provider');
-
 var _child_process = require('child_process');
 
 var _child_process2 = _interopRequireDefault(_child_process);
@@ -34,7 +32,7 @@ var WindowsProvider = {
   getTracks: function getTracks() {
     var _this = this;
 
-    return (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
+    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
       var proc, stdout;
       return _regenerator2.default.wrap(function _callee$(_context) {
         while (1) {
@@ -66,7 +64,7 @@ var WindowsProvider = {
   updateTracks: function updateTracks(counts) {
     var _this2 = this;
 
-    return (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
+    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
       var proc, stdout;
       return _regenerator2.default.wrap(function _callee2$(_context2) {
         while (1) {
