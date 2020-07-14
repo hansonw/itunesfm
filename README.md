@@ -7,7 +7,7 @@ Useful if you scrobble to last.fm from iTunes on multiple computers / devices an
 ## Usage
 
 ```
-npm install -g itunesfm
+npm install -g hansonw/itunesfm
 itunesfm <last.fm username>
 ```
 

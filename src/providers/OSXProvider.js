@@ -4,7 +4,7 @@ import type {ITunesTrackInfo, Provider} from './Provider';
 
 const osa = require('osa');
 
-function Application(): any {} // stub for Flow
+function Application(app: string): any {} // stub for Flow
 
 function osaPromise(fn, ...args): any {
   return new Promise((resolve, reject) => {
