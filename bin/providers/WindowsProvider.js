@@ -1,100 +1,56 @@
-'use strict';
+"use strict";
 
-var _stringify = require('babel-runtime/core-js/json/stringify');
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-var _stringify2 = _interopRequireDefault(_stringify);
+var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
-var _regenerator = require('babel-runtime/regenerator');
+var _child_process = _interopRequireDefault(require("child_process"));
 
-var _regenerator2 = _interopRequireDefault(_regenerator);
+var _path = _interopRequireDefault(require("path"));
 
-var _promise = require('babel-runtime/core-js/promise');
+const SCRIPTS_DIR = _path.default.resolve(__dirname, '../../scripts');
 
-var _promise2 = _interopRequireDefault(_promise);
+const WindowsProvider = {
+  getTracks() {
+    return (0, _asyncToGenerator2.default)(function* () {
+      const proc = _child_process.default.spawn('wscript.exe', [_path.default.join(SCRIPTS_DIR, 'win_getTracks.js')]);
 
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-var _child_process = require('child_process');
-
-var _child_process2 = _interopRequireDefault(_child_process);
-
-var _path = require('path');
-
-var _path2 = _interopRequireDefault(_path);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var SCRIPTS_DIR = _path2.default.resolve(__dirname, '../../scripts');
-
-var WindowsProvider = {
-  getTracks: function getTracks() {
-    var _this = this;
-
-    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-      var proc, stdout;
-      return _regenerator2.default.wrap(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              proc = _child_process2.default.spawn('wscript.exe', [_path2.default.join(SCRIPTS_DIR, 'win_getTracks.js')]);
-              stdout = '';
-
-              proc.stdout.on('data', function (data) {
-                stdout += data;
-              });
-              return _context.abrupt('return', new _promise2.default(function (resolve, reject) {
-                proc.on('close', function (code) {
-                  if (code !== 0) {
-                    reject(new Error('getTracks failed with code ' + code));
-                  }
-                  resolve(JSON.parse(decodeURIComponent(stdout)));
-                });
-              }));
-
-            case 4:
-            case 'end':
-              return _context.stop();
+      let stdout = '';
+      proc.stdout.on('data', data => {
+        stdout += data;
+      });
+      return new Promise((resolve, reject) => {
+        proc.on('close', code => {
+          if (code !== 0) {
+            reject(new Error(`getTracks failed with code ${code}`));
           }
-        }
-      }, _callee, _this);
-    }))();
+
+          resolve(JSON.parse(decodeURIComponent(stdout)));
+        });
+      });
+    })();
   },
-  updateTracks: function updateTracks(counts) {
-    var _this2 = this;
 
-    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
-      var proc, stdout;
-      return _regenerator2.default.wrap(function _callee2$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              proc = _child_process2.default.spawn('wscript.exe', [_path2.default.join(SCRIPTS_DIR, 'win_updateTracks.js')]);
+  updateTracks(counts) {
+    return (0, _asyncToGenerator2.default)(function* () {
+      const proc = _child_process.default.spawn('wscript.exe', [_path.default.join(SCRIPTS_DIR, 'win_updateTracks.js')]);
 
-              proc.stdin.write(encodeURIComponent((0, _stringify2.default)(counts)) + '\n');
-              stdout = '';
-
-              proc.stdout.on('data', function (data) {
-                console.log(data.toString());
-              });
-              return _context2.abrupt('return', new _promise2.default(function (resolve, reject) {
-                proc.on('close', function (code) {
-                  if (code !== 0) {
-                    reject(new Error('updateTracks failed with code ' + code));
-                  }
-                  resolve();
-                });
-              }));
-
-            case 5:
-            case 'end':
-              return _context2.stop();
+      proc.stdin.write(encodeURIComponent(JSON.stringify(counts)) + '\n');
+      let stdout = '';
+      proc.stdout.on('data', data => {
+        console.log(data.toString());
+      });
+      return new Promise((resolve, reject) => {
+        proc.on('close', code => {
+          if (code !== 0) {
+            reject(new Error(`updateTracks failed with code ${code}`));
           }
-        }
-      }, _callee2, _this2);
-    }))();
-  }
-};
 
+          resolve();
+        });
+      });
+    })();
+  }
+
+};
 module.exports = WindowsProvider;

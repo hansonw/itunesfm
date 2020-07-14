@@ -1,6 +1,6 @@
 # itunesfm
 
-A small script to sync your play counts from [last.fm](http://last.fm) back to iTunes. Supports both Windows and Mac OS X without any native dependencies.
+A small script to sync your play counts from [last.fm](http://last.fm) back to iTunes. Supports both Windows and Mac OS X without any native dependencies. (Requires Music.app on OS X.)
 
 Useful if you scrobble to last.fm from iTunes on multiple computers / devices and want to keep your local play counts consistent.
 

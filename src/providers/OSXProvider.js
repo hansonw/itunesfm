@@ -21,14 +21,11 @@ function osaPromise(fn, ...args): any {
 const OSXProvider: Provider = {
   async getTracks() {
     return await osaPromise(() => {
-      var itunes = Application('iTunes');
+      var itunes = Application('Music');
       var tracks = itunes.libraryPlaylists[0].tracks;
       var result = {};
       for (var i = 0; i < tracks.length; i++) {
         var track = tracks[i];
-        if (track.videoKind() !== 'none') {
-          continue;
-        }
         result[track.persistentID()] = {
           name: track.name(),
           artist: track.artist(),
@@ -41,7 +38,7 @@ const OSXProvider: Provider = {
 
   async updateTracks(counts) {
     await osaPromise((counts) => {
-      var itunes = Application('iTunes');
+      var itunes = Application('Music');
       var tracks = itunes.libraryPlaylists[0].tracks;
       for (var i = 0; i < tracks.length; i++) {
         var track = tracks[i];

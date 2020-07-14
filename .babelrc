@@ -1,10 +1,13 @@
 {
   "presets": [
-    "es2015",
-    "stage-0",
+    "@babel/preset-flow",
+    ["@babel/preset-env", {
+      "targets": {
+        "node": "7"
+      }
+    }]
   ],
   "plugins": [
-    "syntax-flow",
-    "transform-flow-strip-types",
-  ],
+    ["@babel/plugin-transform-runtime"]
+  ]
 }
