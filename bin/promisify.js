@@ -1,18 +1,15 @@
 "use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = promisify;
-
+Object.defineProperty(exports, "__esModule", { value: true });
 function promisify(obj, func, ...args) {
-  return new Promise((resolve, reject) => {
-    obj[func].apply(obj, args.concat((err, result) => {
-      if (err != null) {
-        reject(err);
-      } else {
-        resolve(result);
-      }
-    }));
-  });
+    return new Promise((resolve, reject) => {
+        obj[func].apply(obj, args.concat((err, result) => {
+            if (err != null) {
+                reject(err);
+            }
+            else {
+                resolve(result);
+            }
+        }));
+    });
 }
+exports.default = promisify;

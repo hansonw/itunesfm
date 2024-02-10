@@ -1,49 +1,49 @@
 /* @flow */
 
-import LastfmAPI from 'lastfmapi';
-import promisify from './promisify';
-import levenshtein from 'levenshtein-edit-distance';
-import fs from 'fs';
-import path from 'path';
+import LastfmAPI from "lastfmapi";
+import promisify from "./promisify";
+import levenshtein from "levenshtein-edit-distance";
+import fs from "fs";
+import path from "path";
 
 const lfm = new LastfmAPI({
-  'api_key' : 'f21088bf9097b49ad4e7f487abab981e',
-  'secret' : '7ccaec2093e33cded282ec7bc81c6fca'
+  api_key: "f21088bf9097b49ad4e7f487abab981e",
+  secret: "7ccaec2093e33cded282ec7bc81c6fca",
 });
 
 const URL_REGEX = /^.+last.fm\/music\/([^/]+)\/[^/]+\/([^/]+)$/;
 const LEVENSHTEIN_THRESHOLD = 0.8;
 
 export type TrackInfo = {
-  name: string,
-  duration: string,
-  playcount: string,
-  mbid: string,
-  url: string,
+  name: string;
+  duration: string;
+  playcount: string;
+  mbid: string;
+  url: string;
   artist: {
-    name: string,
-    mbid: string,
-    url: string,
-  },
+    name: string;
+    mbid: string;
+    url: string;
+  };
   // streamable, image, @attr are omitted
 };
 
 type TopTracksResult = {
-  track: Array<TrackInfo>,
-  '@attr': {
-    user: string,
-    page: string,
-    perPage: string,
-    totalPages: string,
-    total: string,
-  },
+  track: Array<TrackInfo>;
+  "@attr": {
+    user: string;
+    page: string;
+    perPage: string;
+    totalPages: string;
+    total: string;
+  };
 };
 
 export async function getTopTracks(
   user: string,
-  useCached: boolean,
+  useCached: boolean
 ): Promise<Array<TrackInfo>> {
-  const CACHE_FILE = path.resolve(__dirname, '../cache.json');
+  const CACHE_FILE = path.resolve(__dirname, "../cache.json");
   if (useCached) {
     try {
       return JSON.parse(fs.readFileSync(CACHE_FILE).toString());
@@ -52,27 +52,27 @@ export async function getTopTracks(
     }
   }
 
-  console.log('Fetching play counts from last.fm..')
-  let tracks = [];
+  console.log("Fetching play counts from last.fm..");
+  let tracks: TrackInfo[] = [];
   for (let page = 1; ; page++) {
-    const result: TopTracksResult = await promisify(lfm.user, 'getTopTracks', {
+    const result: TopTracksResult = await promisify(lfm.user, "getTopTracks", {
       user,
       limit: 1000, // API per-page limit
       page: page,
     });
     tracks = tracks.concat(result.track);
-    const {total} = result['@attr'];
+    const { total } = result["@attr"];
     if (tracks.length >= parseInt(total, 10)) {
       break;
     }
-    console.log('Fetching play counts.. (%d/%d)', tracks.length, total)
+    console.log("Fetching play counts.. (%d/%d)", tracks.length, total);
   }
   // cache results for development purposes
   fs.writeFileSync(CACHE_FILE, JSON.stringify(tracks));
   return tracks;
 }
 
-function match(a: ?string, b: ?string): boolean {
+function match(a: string | null, b: string | null): boolean {
   if (a == null || b == null) {
     return true;
   }
@@ -89,11 +89,11 @@ function tryDecode(url: string): string {
 function findMatchingTracks(
   tracks: Array<TrackInfo>,
   name: string,
-  artist: ?string,
-  urls: ?Array<string>,
-): {matches: Array<TrackInfo>, nameMatches: Array<TrackInfo>} {
-  const matches = [];
-  let nameMatches = [];
+  artist: string | null,
+  urls: Array<string> | null
+): { matches: Array<TrackInfo>; nameMatches: Array<TrackInfo> } {
+  const matches: TrackInfo[] = [];
+  let nameMatches: TrackInfo[] = [];
   for (const track of tracks) {
     if (urls != null) {
       for (const url of urls) {
@@ -115,18 +115,18 @@ function findMatchingTracks(
 
   if (urls == null && matches.length + nameMatches.length === 0) {
     // Try Levenshtein distance; return anything > 80%.
-    const close = [];
+    const close: [number, TrackInfo][] = [];
     for (const track of tracks) {
       const dist = levenshtein(name, track.name, true);
       const ratio = (name.length - dist) / name.length;
       if (ratio >= LEVENSHTEIN_THRESHOLD) {
         close.push([-ratio, track]);
       }
-      nameMatches = close.sort().map(x => x[1]);
+      nameMatches = close.sort().map((x) => x[1]);
     }
   }
 
-  return {matches, nameMatches};
+  return { matches, nameMatches };
 }
 
 function normalizeURL(url: string) {
@@ -142,16 +142,16 @@ function normalizeURL(url: string) {
 export async function matchTrack(
   tracks: Array<TrackInfo>,
   name: string,
-  artist: ?string,
-  urls: ?Array<string>,
+  artist: string | null,
+  urls: Array<string> | null
 ): Promise<Array<TrackInfo>> {
-  const {matches, nameMatches} = findMatchingTracks(
+  const { matches, nameMatches } = findMatchingTracks(
     tracks,
     name,
     artist,
-    urls,
+    urls
   );
-  let result = [];
+  let result: TrackInfo[] = [];
   if (matches.length + nameMatches.length === 0) {
     // TODO: use heuristics to determine possible matches
   } else if (matches.length === 1 || nameMatches.length === 1) {

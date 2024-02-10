@@ -7,7 +7,7 @@ Useful if you scrobble to last.fm from iTunes on multiple computers / devices an
 ## Usage
 
 ```
-npm install -g hansonw/itunesfm
+npx itunesfm
 itunesfm <last.fm username>
 ```
 
@@ -18,6 +18,7 @@ Play counts will only be updated if the last.fm play count is **higher** than yo
 ## Notes
 
 Songs are matched using a fairly naive method:
+
 - First, we look for exact name + artist matches.
 - If none exist, we consider exact name matches only.
 - If still none exist, consider names with >= 80% similarity (via Levenshtein distance)
@@ -45,6 +46,14 @@ You can find the URL for a song on last.fm by checking your scrobble history and
 
 ## Making changes
 
-The source files in `src/` are written in ES6/Flow and transpiled with Babel. Make sure you have the development dependencies installed with `npm install` and then run `npm run build` to re-transpile the changes into `bin/`.
+To compile:
 
-Most of the code is type-checked with [Flow](http://flowtype.org/).
+```
+yarn && yarn build
+```
+
+Run:
+
+```
+yarn start
+```
