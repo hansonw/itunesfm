@@ -10,11 +10,7 @@ function osaPromise(fn, ...args): any {
   return new Promise((resolve, reject) => {
     const jsonArgs = args.map((a) => JSON.stringify(a)).join(',');
     const functionCall = `JSON.stringify((${fn.toString()})(${jsonArgs}))`;
-    const lines = functionCall.replace(/^\s+/g, ' ').replace(/'/g, "'\\''").split('\n');
-    const params = ['-l', 'JavaScript'];
-    for (const line of lines) {
-      params.push('-e', line);
-    }
+    const params = ['-l', 'JavaScript', '-e', functionCall];
     execFile('osascript', params, { maxBuffer: MAX_BUFFER }, (err, stdout) => {
       if (err) {
         reject(err);

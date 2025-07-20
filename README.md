@@ -4,6 +4,12 @@ A small script to sync your play counts from [last.fm](http://last.fm) back to i
 
 Useful if you scrobble to last.fm from iTunes on multiple computers / devices and want to keep your local play counts consistent.
 
+## Changelog
+
+### v1.3.0
+
+- Added retries and fixed handling for large amounts of tracks.
+
 ## Usage
 
 ```

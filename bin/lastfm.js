@@ -45,14 +45,15 @@ async function getTopTracks(user, useCached, limit) {
                 console.warn("Fetch failed; decreasing page size to 500 and retrying..");
                 pageSize = 500;
                 page = Math.floor(tracks.length / pageSize) + 1;
-                continue;
             }
-            if (retries < 3) {
+            else if (retries < 3) {
                 retries++;
                 console.warn("Fetch failed; retrying (%d/3)..", retries);
-                continue;
             }
-            throw e;
+            else {
+                throw e;
+            }
+            await new Promise(r => setTimeout(r, 3000 * retries));
         }
         tracks = tracks.concat(result.track);
         const { total } = result["@attr"];

@@ -1,18 +1,13 @@
 "use strict";
-/* @flow */
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
-const MAX_BUFFER = 10 * 1024 * 1024; // 10MB, supports very large libraries
+const MAX_BUFFER = 1024 * 1024 * 1024; // Track output can be very large
 function Application(app) { } // stub for Flow
 function osaPromise(fn, ...args) {
     return new Promise((resolve, reject) => {
         const jsonArgs = args.map((a) => JSON.stringify(a)).join(',');
         const functionCall = `JSON.stringify((${fn.toString()})(${jsonArgs}))`;
-        const lines = functionCall.replace(/^\s+/g, ' ').replace(/'/g, "'\\''").split('\n');
-        const params = ['-l', 'JavaScript'];
-        for (const line of lines) {
-            params.push('-e', line);
-        }
+        const params = ['-l', 'JavaScript', '-e', functionCall];
         (0, child_process_1.execFile)('osascript', params, { maxBuffer: MAX_BUFFER }, (err, stdout) => {
             if (err) {
                 reject(err);
