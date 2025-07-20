@@ -49,11 +49,11 @@ You can find the URL for a song on last.fm by checking your scrobble history and
 To compile:
 
 ```
-yarn && yarn build
+pnpm install && pnpm run build
 ```
 
 Run:
 
 ```
-yarn start
+pnpm start
 ```

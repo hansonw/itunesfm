@@ -30,6 +30,7 @@
   },
   "author": "Hanson Wang",
   "license": "ISC",
+  "packageManager": "pnpm@10.5.2",
   "devDependencies": {
     "@types/node": "^20.11.17",
     "typescript": "^5.3.3"
