@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = promisify;
 function promisify(obj, func, ...args) {
     return new Promise((resolve, reject) => {
         obj[func].apply(obj, args.concat((err, result) => {
@@ -12,4 +13,3 @@ function promisify(obj, func, ...args) {
         }));
     });
 }
-exports.default = promisify;

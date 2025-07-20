@@ -5,6 +5,7 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import prompt from "prompt";
+import { parseArgs } from "node:util";
 import { getTopTracks, matchTrack } from "./lastfm";
 
 prompt.colors = false;
@@ -58,6 +59,15 @@ async function promptForMatch(
 
 async function main() {
   try {
+    const { values, positionals } = parseArgs({
+      options: {
+        cache: { type: "boolean" },
+        limit: { type: "string" },
+        out: { type: "string" },
+      },
+      allowPositionals: true,
+    });
+
     let provider;
     if (os.platform() === "win32") {
       provider = require("./providers/WindowsProvider.js");
@@ -66,16 +76,23 @@ async function main() {
     } else {
       throw new Error(`platform ${os.platform()} not supported`);
     }
-    // Start fetching from iTunes immediately.
+
     const tracksPromise = provider.getTracks();
 
-    let username = process.argv[2];
+    let username = positionals[0];
     if (username == null) {
       username = await quickPrompt("Enter your last.fm username");
     }
-    const useCached = process.argv.indexOf("cache") !== -1;
+    const useCached = values.cache || false;
+    const limit = values.limit ? parseInt(values.limit, 10) : undefined;
+    const outFile = values.out;
 
-    const topTracks = await getTopTracks(username, useCached);
+    const topTracks = await getTopTracks(username, useCached, limit);
+    if (outFile) {
+      fs.writeFileSync(outFile, topTracks.map((t) => JSON.stringify(t)).join("\n"));
+      console.log(`Wrote ${topTracks.length} tracks to ${outFile}`);
+      return;
+    }
     const myTracks = await tracksPromise;
 
     console.log(

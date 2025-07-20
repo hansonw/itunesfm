@@ -20,7 +20,7 @@
     "node": ">=16"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "rm -rf bin && tsc && tsc -p tsconfig.test.json && node --test ./bin/test/test/getTopTracks.test.js",
     "build": "rm -rf bin && tsc && chmod a+x bin/main.js",
     "start": "node bin/main.js"
   },
@@ -33,6 +33,7 @@
   "packageManager": "pnpm@10.5.2",
   "devDependencies": {
     "@types/node": "^20.11.17",
+    "nock": "^14.0.6",
     "typescript": "^5.3.3"
   },
   "dependencies": {

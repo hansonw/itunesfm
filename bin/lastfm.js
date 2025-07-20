@@ -4,7 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.matchTrack = exports.getTopTracks = void 0;
+exports.getTopTracks = getTopTracks;
+exports.matchTrack = matchTrack;
 const lastfmapi_1 = __importDefault(require("lastfmapi"));
 const promisify_1 = __importDefault(require("./promisify"));
 const levenshtein_edit_distance_1 = __importDefault(require("levenshtein-edit-distance"));
@@ -16,7 +17,7 @@ const lfm = new lastfmapi_1.default({
 });
 const URL_REGEX = /^.+last.fm\/music\/([^/]+)\/[^/]+\/([^/]+)$/;
 const LEVENSHTEIN_THRESHOLD = 0.8;
-async function getTopTracks(user, useCached) {
+async function getTopTracks(user, useCached, limit) {
     const CACHE_FILE = path_1.default.resolve(__dirname, "../cache.json");
     if (useCached) {
         try {
@@ -28,24 +29,47 @@ async function getTopTracks(user, useCached) {
     }
     console.log("Fetching play counts from last.fm..");
     let tracks = [];
-    for (let page = 1;; page++) {
-        const result = await (0, promisify_1.default)(lfm.user, "getTopTracks", {
-            user,
-            limit: 1000, // API per-page limit
-            page: page,
-        });
+    let pageSize = 1000; // API per-page limit
+    for (let page = 1, retries = 0;;) {
+        let result = null;
+        try {
+            result = await (0, promisify_1.default)(lfm.user, "getTopTracks", {
+                user,
+                limit: pageSize,
+                page: page,
+            });
+            retries = 0;
+        }
+        catch (e) {
+            if (pageSize > 500) {
+                console.warn("Fetch failed; decreasing page size to 500 and retrying..");
+                pageSize = 500;
+                page = Math.floor(tracks.length / pageSize) + 1;
+                continue;
+            }
+            if (retries < 3) {
+                retries++;
+                console.warn("Fetch failed; retrying (%d/3)..", retries);
+                continue;
+            }
+            throw e;
+        }
         tracks = tracks.concat(result.track);
         const { total } = result["@attr"];
-        if (tracks.length >= parseInt(total, 10)) {
+        if ((limit != null && tracks.length >= limit) ||
+            tracks.length >= parseInt(total, 10)) {
             break;
         }
-        console.log("Fetching play counts.. (%d/%d)", tracks.length, total);
+        console.log("Fetching play counts.. (%d/%d)", tracks.length, limit != null ? Math.min(limit, parseInt(total, 10)) : total);
+        page++;
+    }
+    if (limit != null) {
+        tracks = tracks.slice(0, limit);
     }
     // cache results for development purposes
     fs_1.default.writeFileSync(CACHE_FILE, JSON.stringify(tracks));
     return tracks;
 }
-exports.getTopTracks = getTopTracks;
 function match(a, b) {
     if (a == null || b == null) {
         return true;
@@ -116,4 +140,3 @@ async function matchTrack(tracks, name, artist, urls) {
     }
     return result;
 }
-exports.matchTrack = matchTrack;
