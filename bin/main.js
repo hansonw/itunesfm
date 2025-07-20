@@ -8,6 +8,7 @@ const fs_1 = __importDefault(require("fs"));
 const os_1 = __importDefault(require("os"));
 const path_1 = __importDefault(require("path"));
 const prompt_1 = __importDefault(require("prompt"));
+const node_util_1 = require("node:util");
 const lastfm_1 = require("./lastfm");
 prompt_1.default.colors = false;
 // Store ambiguous songs in this DB.
@@ -42,6 +43,14 @@ async function promptForMatch(name, artist, matches) {
 }
 async function main() {
     try {
+        const { values, positionals } = (0, node_util_1.parseArgs)({
+            options: {
+                cache: { type: "boolean" },
+                limit: { type: "string" },
+                out: { type: "string" },
+            },
+            allowPositionals: true,
+        });
         let provider;
         if (os_1.default.platform() === "win32") {
             provider = require("./providers/WindowsProvider.js");
@@ -52,14 +61,20 @@ async function main() {
         else {
             throw new Error(`platform ${os_1.default.platform()} not supported`);
         }
-        // Start fetching from iTunes immediately.
         const tracksPromise = provider.getTracks();
-        let username = process.argv[2];
+        let username = positionals[0];
         if (username == null) {
             username = await quickPrompt("Enter your last.fm username");
         }
-        const useCached = process.argv.indexOf("cache") !== -1;
-        const topTracks = await (0, lastfm_1.getTopTracks)(username, useCached);
+        const useCached = values.cache || false;
+        const limit = values.limit ? parseInt(values.limit, 10) : undefined;
+        const outFile = values.out;
+        const topTracks = await (0, lastfm_1.getTopTracks)(username, useCached, limit);
+        if (outFile) {
+            fs_1.default.writeFileSync(outFile, topTracks.map((t) => JSON.stringify(t)).join("\n"));
+            console.log(`Wrote ${topTracks.length} tracks to ${outFile}`);
+            return;
+        }
         const myTracks = await tracksPromise;
         console.log("Found %d tracks locally, %d on last.fm.", Object.keys(myTracks).length, topTracks.length);
         let matching = {};

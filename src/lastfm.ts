@@ -41,7 +41,8 @@ type TopTracksResult = {
 
 export async function getTopTracks(
   user: string,
-  useCached: boolean
+  useCached: boolean,
+  limit?: number
 ): Promise<Array<TrackInfo>> {
   const CACHE_FILE = path.resolve(__dirname, "../cache.json");
   if (useCached) {
@@ -54,18 +55,45 @@ export async function getTopTracks(
 
   console.log("Fetching play counts from last.fm..");
   let tracks: TrackInfo[] = [];
-  for (let page = 1; ; page++) {
-    const result: TopTracksResult = await promisify(lfm.user, "getTopTracks", {
-      user,
-      limit: 1000, // API per-page limit
-      page: page,
-    });
+  let pageSize = 1000; // API per-page limit
+  for (let page = 1, retries = 0; ; ) {
+    let result: TopTracksResult | null = null;
+    try {
+      result = await promisify(lfm.user, "getTopTracks", {
+        user,
+        limit: pageSize,
+        page: page,
+      });
+      retries = 0;
+    } catch (e) {
+      if (pageSize > 500) {
+        console.warn("Fetch failed; decreasing page size to 500 and retrying..");
+        pageSize = 500;
+        page = Math.floor(tracks.length / pageSize) + 1;
+        continue;
+      }
+      if (retries < 3) {
+        retries++;
+        console.warn("Fetch failed; retrying (%d/3)..", retries);
+        continue;
+      }
+      throw e;
+    }
     tracks = tracks.concat(result.track);
     const { total } = result["@attr"];
-    if (tracks.length >= parseInt(total, 10)) {
+    if ((limit != null && tracks.length >= limit) ||
+        tracks.length >= parseInt(total, 10)) {
       break;
     }
-    console.log("Fetching play counts.. (%d/%d)", tracks.length, total);
+    console.log(
+      "Fetching play counts.. (%d/%d)",
+      tracks.length,
+      limit != null ? Math.min(limit, parseInt(total, 10)) : total
+    );
+    page++;
+  }
+  if (limit != null) {
+    tracks = tracks.slice(0, limit);
   }
   // cache results for development purposes
   fs.writeFileSync(CACHE_FILE, JSON.stringify(tracks));
