@@ -1,16 +1,33 @@
 "use strict";
 /* @flow */
 Object.defineProperty(exports, "__esModule", { value: true });
-const osa = require('osa');
+const child_process_1 = require("child_process");
+const MAX_BUFFER = 10 * 1024 * 1024; // 10MB, supports very large libraries
 function Application(app) { } // stub for Flow
 function osaPromise(fn, ...args) {
     return new Promise((resolve, reject) => {
-        osa(fn, ...args, (err, result) => {
+        const jsonArgs = args.map((a) => JSON.stringify(a)).join(',');
+        const functionCall = `JSON.stringify((${fn.toString()})(${jsonArgs}))`;
+        const lines = functionCall.replace(/^\s+/g, ' ').replace(/'/g, "'\\''").split('\n');
+        const params = ['-l', 'JavaScript'];
+        for (const line of lines) {
+            params.push('-e', line);
+        }
+        (0, child_process_1.execFile)('osascript', params, { maxBuffer: MAX_BUFFER }, (err, stdout) => {
             if (err) {
                 reject(err);
+                return;
             }
-            else {
-                resolve(result);
+            try {
+                if (stdout.trim() === '') {
+                    resolve(undefined);
+                }
+                else {
+                    resolve(JSON.parse(stdout));
+                }
+            }
+            catch (e) {
+                reject(new Error('Function did not return an object: ' + e.message));
             }
         });
     });
