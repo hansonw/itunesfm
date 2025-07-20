@@ -42,7 +42,5 @@
     "prompt": "^1.3.0",
     "xmldoc": "^0.4.0"
   },
-  "optionalDependencies": {
-    "osa": ""
-  }
+  "optionalDependencies": {}
 }

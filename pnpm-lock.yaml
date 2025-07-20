@@ -30,10 +30,6 @@ importers:
       typescript:
         specifier: ^5.3.3
         version: 5.8.3
-    optionalDependencies:
-      osa:
-        specifier: ''
-        version: 2.5.0
 
 packages:
 
@@ -104,9 +100,6 @@ packages:
   nock@14.0.6:
     resolution: {integrity: sha512-67n1OfusL/ON57fwFJ6ZurSJa/msYVQmqlz9rCel2HJYj4Zeb8v9TcmRdEW+PV2i9Fm2358umSvzZukhw/E8DA==}
     engines: {node: '>=18.20.0 <20 || >=20.12.1'}
-
-  osa@2.5.0:
-    resolution: {integrity: sha512-FZv4/iM4cNXS6ayyj6QQEJXXFxKnuF4UvuC3JYzH3nQNtC3z32vpcwEZdojDGIUglsqjVYWwH2gjvvNuqImuSA==}
 
   outvariant@1.4.3:
     resolution: {integrity: sha512-+Sl2UErvtsoajRDKCE5/dBz4DIvHXQQnAxtQTF04OJxY0+DyZXSo5P5Bb7XYWOh81syohlYL24hbDwxedPUJCA==}
@@ -217,9 +210,6 @@ snapshots:
       '@mswjs/interceptors': 0.39.3
       json-stringify-safe: 5.0.1
       propagate: 2.0.1
-
-  osa@2.5.0:
-    optional: true
 
   outvariant@1.4.3: {}
 

@@ -1,18 +1,35 @@
 /* @flow */
 
-import type {ITunesTrackInfo, Provider} from './Provider';
+import type { ITunesTrackInfo, Provider } from "./Provider";
 
-const osa = require('osa');
+import { execFile } from "child_process";
+
+const MAX_BUFFER = 10 * 1024 * 1024; // 10MB, supports very large libraries
 
 function Application(app: string): any {} // stub for Flow
 
 function osaPromise(fn, ...args): any {
   return new Promise((resolve, reject) => {
-    osa(fn, ...args, (err, result) => {
+    const jsonArgs = args.map((a) => JSON.stringify(a)).join(',');
+    const functionCall = `JSON.stringify((${fn.toString()})(${jsonArgs}))`;
+    const lines = functionCall.replace(/^\s+/g, ' ').replace(/'/g, "'\\''").split('\n');
+    const params = ['-l', 'JavaScript'];
+    for (const line of lines) {
+      params.push('-e', line);
+    }
+    execFile('osascript', params, { maxBuffer: MAX_BUFFER }, (err, stdout) => {
       if (err) {
         reject(err);
-      } else {
-        resolve(result);
+        return;
+      }
+      try {
+        if (stdout.trim() === '') {
+          resolve(undefined);
+        } else {
+          resolve(JSON.parse(stdout));
+        }
+      } catch (e) {
+        reject(new Error('Function did not return an object: ' + e.message));
       }
     });
   });
