@@ -1,10 +1,8 @@
-/* @flow */
-
 import type { ITunesTrackInfo, Provider } from "./Provider";
 
 import { execFile } from "child_process";
 
-const MAX_BUFFER = 10 * 1024 * 1024; // 10MB, supports very large libraries
+const MAX_BUFFER = 1024 * 1024 * 1024; // Track output can be very large
 
 function Application(app: string): any {} // stub for Flow
 
