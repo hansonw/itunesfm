@@ -64,6 +64,9 @@ export async function getTopTracks(
         limit: pageSize,
         page: page,
       });
+      if (result == null || !Array.isArray(result.track)) {
+        throw new Error("Invalid response from last.fm");
+      }
       retries = 0;
     } catch (e) {
       if (pageSize > 500) {
@@ -77,6 +80,7 @@ export async function getTopTracks(
         throw e;
       }
       await new Promise(r => setTimeout(r, 3000 * retries));
+      continue;
     }
     tracks = tracks.concat(result.track);
     const { total } = result["@attr"];

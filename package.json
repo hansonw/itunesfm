@@ -1,6 +1,6 @@
 {
   "name": "itunesfm",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Sync last.fm play counts with your iTunes library.",
   "homepage": "https://github.com/hansonw/itunesfm",
   "keywords": [
